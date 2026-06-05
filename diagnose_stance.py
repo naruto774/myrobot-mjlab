@@ -190,11 +190,11 @@ def main() -> None:
   print(
     f"  最低脚点 z  min/mean/max : {mc.min():+.4f} / {mc.mean():+.4f} / {mc.max():+.4f} m"
   )
-  print(f"    (远<0=持续穿地, 远>0=持续悬空; 正常落脚应 ~0)")
+  print("    (远<0=持续穿地, 远>0=持续悬空; 正常落脚应 ~0)")
   print(
     f"  双脚横向跨度 min/mean/max: {lw.min():.4f} / {lw.mean():.4f} / {lw.max():.4f} m"
   )
-  print(f"    (髋间距 ~0.05m; 跨度持续 <~0.03m 说明步态近乎单线, 横向极不稳)")
+  print("    (髋间距 ~0.05m; 跨度持续 <~0.03m 说明步态近乎单线, 横向极不稳)")
   print(f"  质心 y 越界量 max        : {cy.max():+.4f} m  (>0 即质心落在双脚 y 区间外)")
   print(f"  质心 y 越界帧占比        : {out_frac * 100:.1f} %")
 

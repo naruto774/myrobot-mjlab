@@ -44,6 +44,10 @@ from .joint import joint_limits as joint_limits
 from .joint import joint_stiffness as joint_stiffness
 from .joint import qpos0 as qpos0
 
+# Sensor (IMU).
+# isort: split
+from .sensor import imu_bias as imu_bias
+
 # Site.
 # isort: split
 from .site import site_pos as site_pos

@@ -73,6 +73,13 @@ class EntityData:
 
   encoder_bias: torch.Tensor
 
+  # IMU bias buffers, simulating sensor calibration / drift errors. Constant per
+  # episode (resampled by the ``dr.imu_bias`` event). ``imu_ori_bias`` is a
+  # (num_envs, 2) roll/pitch offset (rad) applied to the base orientation reading;
+  # ``imu_gyro_bias`` is a (num_envs, 3) zero-bias (rad/s) added to the gyro reading.
+  imu_ori_bias: torch.Tensor
+  imu_gyro_bias: torch.Tensor
+
   # State dimensions.
   POS_DIM = 3
   QUAT_DIM = 4

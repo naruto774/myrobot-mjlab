@@ -6,10 +6,11 @@ import tyro
 from tqdm import tqdm
 
 import mjlab
+from mjlab.asset_zoo.robots.myrobot.myrobot_constants import MYROBOT_JOINT_NAMES
 from mjlab.entity import Entity
 from mjlab.scene import Scene
 from mjlab.sim.sim import Simulation, SimulationCfg
-from mjlab.tasks.tracking.config.g1.env_cfgs import unitree_g1_flat_tracking_env_cfg
+from mjlab.tasks.tracking.config.myrobot.env_cfgs import myrobot_flat_tracking_env_cfg
 from mjlab.utils.lab_api.math import (
   axis_angle_from_quat,
   quat_conjugate,
@@ -57,10 +58,10 @@ class MotionLoader:
     motion = motion.to(torch.float32).to(self.device)
     # motion[:, 2] -= 0.05
     self.motion_base_poss_input = motion[:, :3]
+    # CSV stores base quaternion as x, y, z, w (columns 3-6).
+    # MuJoCo/Warp expects w, x, y, z, so convert ordering here.
     self.motion_base_rots_input = motion[:, 3:7]
-    self.motion_base_rots_input = self.motion_base_rots_input[
-      :, [3, 0, 1, 2]
-    ]  # convert to wxyz
+    self.motion_base_rots_input = self.motion_base_rots_input[:, [3, 0, 1, 2]]
     self.motion_dof_poss_input = motion[:, 7:]
 
     self.input_frames = motion.shape[0]
@@ -363,7 +364,7 @@ def main(
   sim_cfg = SimulationCfg()
   sim_cfg.mujoco.timestep = 1.0 / output_fps
 
-  scene = Scene(unitree_g1_flat_tracking_env_cfg().scene, device=device)
+  scene = Scene(myrobot_flat_tracking_env_cfg().scene, device=device)
   model = scene.compile()
 
   sim = Simulation(num_envs=1, cfg=sim_cfg, model=model, device=device)
@@ -391,37 +392,7 @@ def main(
   run_sim(
     sim=sim,
     scene=scene,
-    joint_names=[
-      "left_hip_pitch_joint",
-      "left_hip_roll_joint",
-      "left_hip_yaw_joint",
-      "left_knee_joint",
-      "left_ankle_pitch_joint",
-      "left_ankle_roll_joint",
-      "right_hip_pitch_joint",
-      "right_hip_roll_joint",
-      "right_hip_yaw_joint",
-      "right_knee_joint",
-      "right_ankle_pitch_joint",
-      "right_ankle_roll_joint",
-      "waist_yaw_joint",
-      "waist_roll_joint",
-      "waist_pitch_joint",
-      "left_shoulder_pitch_joint",
-      "left_shoulder_roll_joint",
-      "left_shoulder_yaw_joint",
-      "left_elbow_joint",
-      "left_wrist_roll_joint",
-      "left_wrist_pitch_joint",
-      "left_wrist_yaw_joint",
-      "right_shoulder_pitch_joint",
-      "right_shoulder_roll_joint",
-      "right_shoulder_yaw_joint",
-      "right_elbow_joint",
-      "right_wrist_roll_joint",
-      "right_wrist_pitch_joint",
-      "right_wrist_yaw_joint",
-    ],
+    joint_names=list(MYROBOT_JOINT_NAMES),
     input_fps=input_fps,
     input_file=input_file,
     output_fps=output_fps,

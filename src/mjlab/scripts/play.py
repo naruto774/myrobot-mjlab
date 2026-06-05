@@ -1,12 +1,14 @@
 """Script to play RL agent with RSL-RL."""
 
+import csv
 import os
 import sys
 import time as _time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 import tyro
@@ -20,6 +22,7 @@ from mjlab.utils.os import get_wandb_checkpoint_path
 from mjlab.utils.torch import configure_torch_backends
 from mjlab.utils.wrappers import VideoRecorder
 from mjlab.viewer import NativeMujocoViewer, ViserPlayViewer
+from mjlab.viewer.base import PolicyProtocol
 from mjlab.viewer.viser.viewer import CheckpointManager, format_time_ago
 
 
@@ -49,11 +52,69 @@ class PlayConfig:
   viewer: Literal["auto", "native", "viser"] = "auto"
   no_terminations: bool = False
   """Disable all termination conditions (useful for viewing motions with dummy agents)."""
+  save_rollout_csv: str | None = None
+  """If set, save actor observations and actions to this CSV path during play."""
+  rollout_obs_group: str = "actor"
+  """Observation group to record when ``save_rollout_csv`` is set."""
+  rollout_env_id: int = 0
+  """Environment index to record when ``save_rollout_csv`` is set."""
   log_root: str = "logs/rsl_rl"
   """Root directory under which experiment logs are written."""
 
   # Internal flag used by demo script.
   _demo_mode: tyro.conf.Suppress[bool] = False
+
+
+def _wrap_policy_for_rollout_csv(
+  policy: PolicyProtocol,
+  *,
+  obs_group: str,
+  env_id: int,
+) -> tuple[PolicyProtocol, Callable[[str], None]]:
+  """Wrap policy to buffer obs/action rows; flush writes a CSV on play exit."""
+  rows: list[tuple[list[float], list[float]]] = []
+
+  class RecordingPolicy:
+    def __call__(self, obs: Any) -> torch.Tensor:
+      actions = policy(obs)
+      if obs_group not in obs:
+        raise KeyError(
+          f"Observation group '{obs_group}' not found. "
+          f"Available groups: {list(obs.keys())}"
+        )
+      obs_row = obs[obs_group][env_id].detach().cpu().tolist()
+      action_row = actions[env_id].detach().cpu().tolist()
+      rows.append((obs_row, action_row))
+      return actions
+
+    def reset(self) -> None:
+      rows.clear()
+      reset_fn = getattr(policy, "reset", None)
+      if reset_fn is not None:
+        reset_fn()
+
+  def flush(path: str) -> None:
+    if not rows:
+      print("[WARN]: No rollout rows recorded; CSV not written.")
+      return
+    obs_dim = len(rows[0][0])
+    action_dim = len(rows[0][1])
+    header = [f"obs_{i}" for i in range(obs_dim)] + [
+      f"action_{i}" for i in range(action_dim)
+    ]
+    output_path = Path(path).expanduser().resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="") as f:
+      writer = csv.writer(f)
+      writer.writerow(header)
+      for obs_row, action_row in rows:
+        writer.writerow(obs_row + action_row)
+    print(
+      f"[INFO]: Saved rollout CSV to {output_path} "
+      f"(steps={len(rows)}, obs_dim={obs_dim}, action_dim={action_dim})"
+    )
+
+  return RecordingPolicy(), flush
 
 
 def run_play(task_id: str, cfg: PlayConfig):
@@ -279,6 +340,19 @@ def run_play(task_id: str, cfg: PlayConfig):
         run_status=wandb_run.state,
       )
 
+  flush_rollout_csv: Callable[[str], None] | None = None
+  if cfg.save_rollout_csv is not None:
+    if not (0 <= cfg.rollout_env_id < env.num_envs):
+      env.close()
+      raise ValueError(
+        f"rollout_env_id out of range: {cfg.rollout_env_id} (num_envs={env.num_envs})"
+      )
+    policy, flush_rollout_csv = _wrap_policy_for_rollout_csv(
+      policy,
+      obs_group=cfg.rollout_obs_group,
+      env_id=cfg.rollout_env_id,
+    )
+
   # Handle "auto" viewer selection.
   if cfg.viewer == "auto":
     has_display = bool(os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY"))
@@ -287,12 +361,16 @@ def run_play(task_id: str, cfg: PlayConfig):
   else:
     resolved_viewer = cfg.viewer
 
-  if resolved_viewer == "native":
-    NativeMujocoViewer(env, policy).run()
-  elif resolved_viewer == "viser":
-    ViserPlayViewer(env, policy, checkpoint_manager=ckpt_manager).run()
-  else:
-    raise RuntimeError(f"Unsupported viewer backend: {resolved_viewer}")
+  try:
+    if resolved_viewer == "native":
+      NativeMujocoViewer(env, policy).run()
+    elif resolved_viewer == "viser":
+      ViserPlayViewer(env, policy, checkpoint_manager=ckpt_manager).run()
+    else:
+      raise RuntimeError(f"Unsupported viewer backend: {resolved_viewer}")
+  finally:
+    if flush_rollout_csv is not None and cfg.save_rollout_csv is not None:
+      flush_rollout_csv(cfg.save_rollout_csv)
 
   env.close()
 

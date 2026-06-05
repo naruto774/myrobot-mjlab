@@ -45,37 +45,45 @@ def make_tracking_env_cfg() -> ManagerBasedRlEnvCfg:
   ##
 
   actor_terms = {
+    # 当前帧参考动作的关节目标
     "command": ObservationTermCfg(
       func=mdp.generated_commands, params={"command_name": "motion"}
     ),
+    # 参考锚点相对机器人锚点的位置（机器人锚点坐标系）
     "motion_anchor_pos_b": ObservationTermCfg(
       func=mdp.motion_anchor_pos_b,
       params={"command_name": "motion"},
       noise=Unoise(n_min=-0.25, n_max=0.25),
     ),
+    # 姿态误差（旋转矩阵前两行，6D 表示）
     "motion_anchor_ori_b": ObservationTermCfg(
       func=mdp.motion_anchor_ori_b,
       params={"command_name": "motion"},
       noise=Unoise(n_min=-0.05, n_max=0.05),
     ),
+    # 基座线速度（全局坐标系）
     "base_lin_vel": ObservationTermCfg(
       func=mdp.builtin_sensor,
       params={"sensor_name": "robot/imu_lin_vel"},
       noise=Unoise(n_min=-0.5, n_max=0.5),
     ),
+    # 基座角速度（全局坐标系）
     "base_ang_vel": ObservationTermCfg(
       func=mdp.builtin_sensor,
       params={"sensor_name": "robot/imu_ang_vel"},
-      noise=Unoise(n_min=-0.2, n_max=0.2),
+      noise=Unoise(n_min=-0.3, n_max=0.3),
     ),
+    # 关节位置（关节坐标系）
     "joint_pos": ObservationTermCfg(
       func=mdp.joint_pos_rel,
       noise=Unoise(n_min=-0.01, n_max=0.01),
       params={"biased": True},
     ),
+    # 关节速度（关节坐标系）
     "joint_vel": ObservationTermCfg(
       func=mdp.joint_vel_rel, noise=Unoise(n_min=-0.5, n_max=0.5)
     ),
+    # 上一帧动作
     "actions": ObservationTermCfg(func=mdp.last_action),
   }
 
@@ -237,7 +245,7 @@ def make_tracking_env_cfg() -> ManagerBasedRlEnvCfg:
       weight=1.0,
       params={"command_name": "motion", "std": 3.14},
     ),
-    "action_rate_l2": RewardTermCfg(func=mdp.action_rate_l2, weight=-1e-1),
+    "action_rate_l2": RewardTermCfg(func=mdp.action_rate_l2, weight=-0.2),
     "joint_limit": RewardTermCfg(
       func=mdp.joint_pos_limits,
       weight=-10.0,

@@ -787,6 +787,11 @@ class Entity:
     else:
       encoder_bias = torch.empty(nworld, 0, dtype=torch.float, device=device)
 
+    # IMU bias buffers for simulating sensor calibration / drift errors. Every
+    # entity has a root, so these are always allocated. Default to zero (no bias).
+    imu_ori_bias = torch.zeros((nworld, 2), dtype=torch.float, device=device)
+    imu_gyro_bias = torch.zeros((nworld, 3), dtype=torch.float, device=device)
+
     self._data = EntityData(
       indexing=indexing,
       data=data,
@@ -811,6 +816,8 @@ class Entity:
       tendon_effort_target=tendon_effort_target,
       site_effort_target=site_effort_target,
       encoder_bias=encoder_bias,
+      imu_ori_bias=imu_ori_bias,
+      imu_gyro_bias=imu_gyro_bias,
     )
 
   def update(self, dt: float) -> None:

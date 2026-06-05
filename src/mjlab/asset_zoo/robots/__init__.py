@@ -4,6 +4,15 @@ from mjlab.asset_zoo.robots.i2rt_yam.yam_constants import (
 from mjlab.asset_zoo.robots.i2rt_yam.yam_constants import (
   get_yam_robot_cfg as get_yam_robot_cfg,
 )
+from mjlab.asset_zoo.robots.myrobot.myrobot_constants import (
+  MYROBOT_ACTION_SCALE as MYROBOT_ACTION_SCALE,
+)
+from mjlab.asset_zoo.robots.myrobot.myrobot_constants import (
+  MYROBOT_JOINT_NAMES as MYROBOT_JOINT_NAMES,
+)
+from mjlab.asset_zoo.robots.myrobot.myrobot_constants import (
+  get_myrobot_robot_cfg as get_myrobot_robot_cfg,
+)
 from mjlab.asset_zoo.robots.unitree_g1.g1_constants import (
   G1_ACTION_SCALE as G1_ACTION_SCALE,
 )
