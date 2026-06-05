@@ -56,7 +56,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Jun 02, 2026"/>
+    <meta name="docbuild:last-update" content="Jun 05, 2026"/>
   </head>
   
   
@@ -1220,6 +1220,11 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
       <span class="n">encoder_bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">nworld</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
 
+    <span class="c1"># IMU bias buffers for simulating sensor calibration / drift errors. Every</span>
+    <span class="c1"># entity has a root, so these are always allocated. Default to zero (no bias).</span>
+    <span class="n">imu_ori_bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nworld</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">imu_gyro_bias</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nworld</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">EntityData</span><span class="p">(</span>
       <span class="n">indexing</span><span class="o">=</span><span class="n">indexing</span><span class="p">,</span>
       <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
@@ -1244,6 +1249,8 @@ document.write(`
       <span class="n">tendon_effort_target</span><span class="o">=</span><span class="n">tendon_effort_target</span><span class="p">,</span>
       <span class="n">site_effort_target</span><span class="o">=</span><span class="n">site_effort_target</span><span class="p">,</span>
       <span class="n">encoder_bias</span><span class="o">=</span><span class="n">encoder_bias</span><span class="p">,</span>
+      <span class="n">imu_ori_bias</span><span class="o">=</span><span class="n">imu_ori_bias</span><span class="p">,</span>
+      <span class="n">imu_gyro_bias</span><span class="o">=</span><span class="n">imu_gyro_bias</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -1808,7 +1815,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Jun 02, 2026.
+  Last updated on Jun 05, 2026.
   <br/>
 </p>
   </div>
