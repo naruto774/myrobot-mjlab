@@ -6,11 +6,11 @@ import tyro
 from tqdm import tqdm
 
 import mjlab
-from mjlab.asset_zoo.robots.myrobot.myrobot_constants import MYROBOT_JOINT_NAMES
+from mjlab.asset_zoo.robots.marsdog.marsdog_constants import MARSDOG_JOINT_NAMES
 from mjlab.entity import Entity
 from mjlab.scene import Scene
 from mjlab.sim.sim import Simulation, SimulationCfg
-from mjlab.tasks.tracking.config.myrobot.env_cfgs import myrobot_flat_tracking_env_cfg
+from mjlab.tasks.tracking.config.marsdog.env_cfgs import marsdog_flat_tracking_env_cfg
 from mjlab.utils.lab_api.math import (
   axis_angle_from_quat,
   quat_conjugate,
@@ -364,7 +364,7 @@ def main(
   sim_cfg = SimulationCfg()
   sim_cfg.mujoco.timestep = 1.0 / output_fps
 
-  scene = Scene(myrobot_flat_tracking_env_cfg().scene, device=device)
+  scene = Scene(marsdog_flat_tracking_env_cfg().scene, device=device)
   model = scene.compile()
 
   sim = Simulation(num_envs=1, cfg=sim_cfg, model=model, device=device)
@@ -392,7 +392,7 @@ def main(
   run_sim(
     sim=sim,
     scene=scene,
-    joint_names=list(MYROBOT_JOINT_NAMES),
+    joint_names=list(MARSDOG_JOINT_NAMES),
     input_fps=input_fps,
     input_file=input_file,
     output_fps=output_fps,

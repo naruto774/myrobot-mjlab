@@ -226,9 +226,9 @@ def make_velocity_env_cfg() -> ManagerBasedRlEnvCfg:
       interval_range_s=(1.0, 3.0),
       params={
         "velocity_range": {
-          "x": (-0.5, 0.5),
-          "y": (-0.5, 0.5),
-          "z": (-0.4, 0.4),
+          "x": (-0.1, 0.1),
+          "y": (-0.1, 0.1),
+          "z": (-0.1, 0.1),
           "roll": (-0.52, 0.52),
           "pitch": (-0.52, 0.52),
           "yaw": (-0.78, 0.78),
@@ -260,9 +260,9 @@ def make_velocity_env_cfg() -> ManagerBasedRlEnvCfg:
         "asset_cfg": SceneEntityCfg("robot", body_names=()),  # Set per-robot.
         "operation": "add",
         "ranges": {
-          0: (-0.025, 0.025),
-          1: (-0.025, 0.025),
-          2: (-0.03, 0.03),
+          0: (-0.01, 0.01),
+          1: (-0.01, 0.01),
+          2: (-0.02, 0.02),
         },
       },
     ),

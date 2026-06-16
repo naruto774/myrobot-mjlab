@@ -1,9 +1,12 @@
-"""myrobot flat tracking environment configurations."""
+"""marsdog flat tracking environment configurations."""
+
+import mujoco
 
 from mjlab.asset_zoo.robots import (
-  MYROBOT_ACTION_SCALE,
-  get_myrobot_robot_cfg,
+  MARSDOG_ACTION_SCALE,
+  get_marsdog_robot_cfg,
 )
+from mjlab.asset_zoo.robots.marsdog.marsdog_constants import MARSDOG_JOINT_NAMES
 from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.envs.mdp import dr
 from mjlab.envs.mdp.actions import JointPositionActionCfg
@@ -16,14 +19,38 @@ from mjlab.tasks.tracking.mdp import MotionCommandCfg
 from mjlab.tasks.tracking.tracking_env_cfg import make_tracking_env_cfg
 
 
-def myrobot_flat_tracking_env_cfg(
+def _add_marsdog_step(spec: mujoco.MjSpec) -> None:
+  """Add the fixed step used by the Marsdog reference motion."""
+  spec.add_material(name="step", rgba=(0.35, 0.35, 0.35, 1.0))
+  spec.worldbody.add_body(name="step").add_geom(
+    name="step1",
+    type=mujoco.mjtGeom.mjGEOM_BOX,
+    size=(0.8, 0.40, 0.15),
+    pos=(0.0, -1.9, 0.15),
+    material="step",
+    friction=(0.8, 0.005, 0.0001),
+  )
+
+
+def marsdog_flat_tracking_env_cfg(
   has_state_estimation: bool = True,
   play: bool = False,
 ) -> ManagerBasedRlEnvCfg:
-  """Create myrobot flat terrain tracking configuration."""
+  """Create marsdog flat terrain tracking configuration."""
   cfg = make_tracking_env_cfg()
-
-  cfg.scene.entities = {"robot": get_myrobot_robot_cfg()}
+  cfg.sim.nconmax = None
+  cfg.sim.njmax = 2048
+  cfg.sim.contact_sensor_maxmatch = 192
+  cfg.scene.spec_fn = _add_marsdog_step
+  cfg.scene.entities = {"robot": get_marsdog_robot_cfg()}
+  # The reference motion uses a single fixed step at a world-space location, but
+  # the step geom lives in the shared model and is not replicated per env. With a
+  # nonzero env_spacing the grid layout offsets each env's robot/reference motion
+  # away from that single step, so only one env actually lands on it. Collapse the
+  # env grid to the origin (all envs overlap) so every env shares the one step.
+  # mjwarp simulates each env in an isolated world, so overlapping robots never
+  # collide across envs.
+  cfg.scene.env_spacing = 0.0
 
   self_collision_cfg = ContactSensorCfg(
     name="self_collision",
@@ -38,32 +65,36 @@ def myrobot_flat_tracking_env_cfg(
 
   joint_pos_action = cfg.actions["joint_pos"]
   assert isinstance(joint_pos_action, JointPositionActionCfg)
-  joint_pos_action.scale = MYROBOT_ACTION_SCALE
+  joint_pos_action.scale = MARSDOG_ACTION_SCALE
 
   motion_cmd = cfg.commands["motion"]
   assert isinstance(motion_cmd, MotionCommandCfg)
   motion_cmd.anchor_body_name = "base_link"
   motion_cmd.body_names = (
-    "base_link",
-    "left_hip_roll_link",
-    "left_knee_link",
-    "left_ankle_roll_link",
-    "right_hip_roll_link",
-    "right_knee_link",
-    "right_ankle_roll_link",
+    "base_link",  # anchor
     "waist_yaw_link",
-    "left_shoulder_roll_link",
-    "left_elbow_link",
-    "right_shoulder_roll_link",
-    "right_elbow_link",
-    "head_link",
+    "waist_pitch_link",
+    "neck_pitch_link",
+    "head_pitch_link",
+    "rl_thigh_link",
+    "rl_calf_link",
+    "rl_foot_link",
+    "rr_thigh_link",
+    "rr_calf_link",
+    "rr_foot_link",
+    "fl_hip_pitch_link",
+    "fl_calf_link",
+    "fl_foot_link",
+    "fr_hip_pitch_link",
+    "fr_calf_link",
+    "fr_foot_link",
   )
 
   cfg.events["foot_friction"].params[
     "asset_cfg"
-  ].geom_names = r"^(l|r)_foot_[12]_collision$"
+  ].geom_names = r"^(fl|fr|rl|rr)_foot_collision$"
   cfg.events["base_com"].params["asset_cfg"].body_names = ("waist_yaw_link",)
-  # Myrobot is lightweight and sensitive to perturbations. Use conservative DR ranges.
+  # marsdog is lightweight and sensitive to perturbations. Use conservative DR ranges.
   cfg.events["base_com"].params["ranges"] = {
     0: (-0.008, 0.008),
     1: (-0.010, 0.010),
@@ -93,7 +124,7 @@ def myrobot_flat_tracking_env_cfg(
   )
 
   # Small, sparse base pushes for general transient-disturbance robustness.
-  # Kept gentler than the base task (myrobot is lightweight and push-sensitive):
+  # Kept gentler than the base task (marsdog is lightweight and push-sensitive):
   # sparser interval and smaller velocity impulses. This is a complement to the
   # compliance DR above, not a substitute for it.
   cfg.events["push_robot"] = EventTermCfg(
@@ -149,10 +180,13 @@ def myrobot_flat_tracking_env_cfg(
     actor_terms[_term].delay_max_lag = 1
 
   cfg.terminations["ee_body_pos"].params["body_names"] = (
-    "left_ankle_roll_link",
-    "right_ankle_roll_link",
-    "left_elbow_link",
-    "right_elbow_link",
+    "fl_foot_link",
+    "fr_foot_link",
+    "rl_foot_link",
+    "rr_foot_link",
+  )
+  cfg.rewards["joint_limit"].params["asset_cfg"] = SceneEntityCfg(
+    "robot", joint_names=MARSDOG_JOINT_NAMES
   )
 
   cfg.viewer.body_name = "base_link"
@@ -187,6 +221,7 @@ def myrobot_flat_tracking_env_cfg(
         cfg.observations["actor"].terms[_term].delay_max_lag = 0
     motion_cmd.pose_range = {}
     motion_cmd.velocity_range = {}
+    motion_cmd.joint_position_range = (0.0, 0.0)
     motion_cmd.sampling_mode = "start"
 
   return cfg
