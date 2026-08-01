@@ -150,12 +150,12 @@ def make_tracking_env_cfg() -> ManagerBasedRlEnvCfg:
       resampling_time_range=(1.0e9, 1.0e9),
       debug_vis=True,
       pose_range={
-        "x": (-0.05, 0.05),
-        "y": (-0.05, 0.05),
-        "z": (-0.01, 0.01),
-        "roll": (-0.1, 0.1),
-        "pitch": (-0.1, 0.1),
-        "yaw": (-0.2, 0.2),
+        "x": (-0.0, 0.0),
+        "y": (-0.00, 0.0),
+        "z": (-0.00, 0.0),
+        "roll": (-0.0, 0.0),
+        "pitch": (-0.0, 0.0),
+        "yaw": (-0.0, 0.0),
       },
       velocity_range=VELOCITY_RANGE,
       joint_position_range=(-0.1, 0.1),
@@ -266,21 +266,21 @@ def make_tracking_env_cfg() -> ManagerBasedRlEnvCfg:
     "time_out": TerminationTermCfg(func=mdp.time_out, time_out=True),
     "anchor_pos": TerminationTermCfg(
       func=mdp.bad_anchor_pos_z_only,
-      params={"command_name": "motion", "threshold": 0.25},
+      params={"command_name": "motion", "threshold": 0.35},
     ),
     "anchor_ori": TerminationTermCfg(
       func=mdp.bad_anchor_ori,
       params={
         "asset_cfg": SceneEntityCfg("robot"),
         "command_name": "motion",
-        "threshold": 0.8,
+        "threshold": 1.0,  # 0.8
       },
     ),
     "ee_body_pos": TerminationTermCfg(
       func=mdp.bad_motion_body_pos_z_only,
       params={
         "command_name": "motion",
-        "threshold": 0.25,
+        "threshold": 0.35,  # 0.25
         "body_names": (),  # Set per-robot.
       },
     ),

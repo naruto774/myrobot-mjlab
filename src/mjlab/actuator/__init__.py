@@ -41,6 +41,12 @@ from mjlab.actuator.learned_actuator import LearnedMlpActuator as LearnedMlpActu
 from mjlab.actuator.learned_actuator import (
   LearnedMlpActuatorCfg as LearnedMlpActuatorCfg,
 )
+from mjlab.actuator.mimic_actuator import (
+  MimicJointPositionActuator as MimicJointPositionActuator,
+)
+from mjlab.actuator.mimic_actuator import (
+  MimicJointPositionActuatorCfg as MimicJointPositionActuatorCfg,
+)
 from mjlab.actuator.pd_actuator import IdealPdActuator as IdealPdActuator
 from mjlab.actuator.pd_actuator import IdealPdActuatorCfg as IdealPdActuatorCfg
 from mjlab.actuator.xml_actuator import XmlActuator as XmlActuator

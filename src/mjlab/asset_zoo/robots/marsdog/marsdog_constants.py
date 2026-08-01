@@ -7,7 +7,7 @@ import mujoco
 from mjlab import MJLAB_SRC_PATH
 from mjlab.actuator import BuiltinPositionActuatorCfg
 from mjlab.entity import EntityArticulationInfoCfg, EntityCfg
-from mjlab.utils.actuator import ElectricActuator, reflected_inertia
+from mjlab.utils.actuator import ElectricActuator
 from mjlab.utils.spec_config import CollisionCfg
 
 ##
@@ -25,8 +25,6 @@ MARSDOG_XML: Path = (
 )
 assert MARSDOG_XML.exists()
 MARSDOG_JOINT_NAMES: tuple[str, ...] = (
-  "tail1_pitch_joint",
-  "tail1_yaw_joint",
   "rl_hip_joint",
   "rl_thigh_joint",
   "rl_calf_joint",
@@ -46,6 +44,8 @@ MARSDOG_JOINT_NAMES: tuple[str, ...] = (
   "fr_hip_pitch_joint",
   "fr_thigh_roll_joint",
   "fr_calf_joint",
+  "fl_tarsus_joint",
+  "fr_tarsus_joint",
 )
 
 
@@ -88,7 +88,11 @@ PA43_ACTUATOR = ElectricActuator(
   velocity_limit=14.66087,
   effort_limit=18,
 )
-
+DM2325_ACTUATOR = ElectricActuator(
+  reflected_inertia=5e-4,
+  velocity_limit=39.8,
+  effort_limit=5,
+)
 NATURAL_FREQ = 10 * 2.0 * 3.1415926535  # 10Hz
 DAMPING_RATIO = 2.0
 
@@ -106,20 +110,16 @@ DAMPING_PA43 = 2 * DAMPING_RATIO * PA43_ACTUATOR.reflected_inertia * NATURAL_FRE
 
 REAR_LEG_STIFFNESS = 12.0
 REAR_LEG_DAMPING = 1.8
-FRONT_LEG_STIFFNESS = 10.0
+
+FRONT_LEG_STIFFNESS = 16.0
 FRONT_LEG_DAMPING = 1.6
+FRONT_TARSUS_STIFFNESS = 10.0
+FRONT_TARSUS_DAMPING = 1.0
 WAIST_STIFFNESS = 20.0
 WAIST_DAMPING = 2.5
 HEAD_TAIL_STIFFNESS = 4.0
 HEAD_TAIL_DAMPING = 0.6
 
-# Rear-leg tarsus joints are PASSIVE: a <equality> in the XML couples each tarsus
-# to its calf (rl_tarsus = +rl_calf, rr_tarsus = -rr_calf), reproducing the real
-# 4-bar linkage. They are therefore NOT actuated here, so the action space matches
-# the hardware (no tarsus motor). The tarsus joints still exist as DOFs, so they
-# remain in the proprioceptive observation and motion command but carry no action.
-# Front-leg tarsus links are fixed (no joint in XML).
-# Tail segments 2-12 mimic tail1 via <equality>; only tail1 is actuated.
 MARSDOG_REAR_HIP_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
   target_names_expr=(
     "rl_hip_joint",
@@ -142,6 +142,7 @@ MARSDOG_REAR_LOWER_LEG_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
   effort_limit=RS00_ACTUATOR.effort_limit,
   armature=RS00_ACTUATOR.reflected_inertia,
 )
+
 MARSDOG_FRONT_HIP_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
   target_names_expr=("fl_hip_pitch_joint", "fr_hip_pitch_joint"),
   stiffness=FRONT_LEG_STIFFNESS,
@@ -160,6 +161,13 @@ MARSDOG_FRONT_LOWER_LEG_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
   damping=FRONT_LEG_DAMPING,
   effort_limit=EL05_ACTUATOR.effort_limit,
   armature=EL05_ACTUATOR.reflected_inertia,
+)
+MARSDOG_FRONT_TARSUS_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
+  target_names_expr=("fl_tarsus_joint", "fr_tarsus_joint"),
+  stiffness=FRONT_TARSUS_STIFFNESS,
+  damping=FRONT_TARSUS_DAMPING,
+  effort_limit=DM2325_ACTUATOR.effort_limit,
+  armature=DM2325_ACTUATOR.reflected_inertia,
 )
 MARSDOG_WAIST_ROLL_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
   target_names_expr=("waist_roll_joint",),
@@ -190,8 +198,6 @@ MARSDOG_HEAD_TAIL_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
     "head_roll_joint",
     "head_yaw_joint",
     "head_pitch_joint",
-    "tail1_pitch_joint",
-    "tail1_yaw_joint",
   ),
   stiffness=HEAD_TAIL_STIFFNESS,
   damping=HEAD_TAIL_DAMPING,
@@ -204,34 +210,24 @@ MARSDOG_HEAD_TAIL_ACTUATOR_CFG = BuiltinPositionActuatorCfg(
 ##
 
 INIT_STATE = EntityCfg.InitialStateCfg(
-  pos=(0.0, 0.0, 0.35),
+  pos=(0.0, 0.0, 0.25),
   joint_pos={
-    "tail1_pitch_joint": 0.0,
-    "tail1_yaw_joint": 0.0,
-    "rl_hip_joint": 0.15,
-    "rl_thigh_joint": 0.11,
-    "rl_calf_joint": 0.0,
-    # Passive: coupled to calf by the XML <equality> (rl_tarsus = +rl_calf).
-    # Keep consistent with rl_calf so reset does not violate the constraint.
-    "rl_tarsus_joint": 0.0,
-    "rr_hip_joint": -0.09,
-    "rr_thigh_joint": -0.47,
-    "rr_calf_joint": 0.0,
-    # Passive: coupled to calf by the XML <equality> (rr_tarsus = -rr_calf).
-    "rr_tarsus_joint": 0.0,
-    "waist_roll_joint": 0.07,
-    "waist_pitch_joint": 0.0,
-    "waist_yaw_joint": -0.10,
-    "neck_pitch_joint": -0.58,
-    "head_roll_joint": -0.04,
-    "head_yaw_joint": -0.03,
-    "head_pitch_joint": 0.50,
-    "fl_hip_pitch_joint": 0.36,
-    "fl_thigh_roll_joint": -0.18,
-    "fl_calf_joint": -0.75,
-    "fr_hip_pitch_joint": -0.42,
-    "fr_thigh_roll_joint": 0.13,
-    "fr_calf_joint": 0.70,
+    "rl_hip_joint": 0.13826222717761993,
+    "rl_thigh_joint": -0.18853963911533356,
+    "rl_calf_joint": 0.02164936251938343,
+    "rl_tarsus_joint": 0.02164936251938343,
+    "rr_hip_joint": 0.04337790980935097,
+    "rr_thigh_joint": -0.4007984697818756,
+    "rr_calf_joint": 0.1781260371208191,
+    "rr_tarsus_joint": -0.1781260371208191,
+    "fl_hip_pitch_joint": 0.24397215247154236,
+    "fl_thigh_roll_joint": -0.08243412524461746,
+    "fl_calf_joint": 0.29261311888694763,
+    "fr_hip_pitch_joint": 0.18704774975776672,
+    "fr_thigh_roll_joint": -0.08918917179107666,
+    "fr_calf_joint": -0.17999999225139618,
+    "fl_tarsus_joint": 0.01103648729622364,
+    "fr_tarsus_joint": 0.35730117559432983,
   },
   joint_vel={".*": 0.0},
 )
@@ -270,6 +266,7 @@ MARSDOG_ARTICULATION = EntityArticulationInfoCfg(
     MARSDOG_REAR_LOWER_LEG_ACTUATOR_CFG,
     MARSDOG_FRONT_HIP_ACTUATOR_CFG,
     MARSDOG_FRONT_LOWER_LEG_ACTUATOR_CFG,
+    MARSDOG_FRONT_TARSUS_ACTUATOR_CFG,
     MARSDOG_WAIST_ROLL_ACTUATOR_CFG,
     MARSDOG_WAIST_PITCH_YAW_ACTUATOR_CFG,
     MARSDOG_NECK_ACTUATOR_CFG,
@@ -287,7 +284,7 @@ def get_marsdog_robot_cfg() -> EntityCfg:
   """
   return EntityCfg(
     init_state=INIT_STATE,
-    collisions=(FULL_COLLISION,),
+    collisions=(FEET_ONLY_COLLISION,),
     spec_fn=get_spec,
     articulation=MARSDOG_ARTICULATION,
   )
@@ -295,14 +292,39 @@ def get_marsdog_robot_cfg() -> EntityCfg:
 
 MARSDOG_ACTION_SCALE: dict[str, float] = {}
 for a in MARSDOG_ARTICULATION.actuators:
-  assert isinstance(a, BuiltinPositionActuatorCfg)
+  if not isinstance(a, BuiltinPositionActuatorCfg):
+    continue
   e = a.effort_limit
   s = a.stiffness
   names = a.target_names_expr
   assert e is not None
   for n in names:
-    MARSDOG_ACTION_SCALE[n] =0.25* e / s
-
+    MARSDOG_ACTION_SCALE[n] = 0.25 * e / s
+MARSDOG_ACTION_SCALE.update(
+  {
+    "fl_hip_pitch_joint": 0.25,
+    "fr_hip_pitch_joint": 0.25,
+    "fl_thigh_roll_joint": 0.25,
+    "fr_thigh_roll_joint": 0.25,
+    "fl_calf_joint": 0.25,
+    "fr_calf_joint": 0.25,
+    "fl_tarsus_joint": 0.25,
+    "fr_tarsus_joint": 0.25,
+    "waist_roll_joint": 0.25,
+    "waist_pitch_joint": 0.25,
+    "waist_yaw_joint": 0.25,
+    "neck_pitch_joint": 0.25,
+    "head_roll_joint": 0.25,
+    "head_yaw_joint": 0.25,
+    "head_pitch_joint": 0.25,
+    "rl_hip_joint": 0.25,
+    "rl_thigh_joint": 0.25,
+    "rl_calf_joint": 0.25,
+    "rr_hip_joint": 0.25,
+    "rr_thigh_joint": 0.25,
+    "rr_calf_joint": 0.25,
+  }
+)
 
 if __name__ == "__main__":
   import mujoco.viewer as viewer

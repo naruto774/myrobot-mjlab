@@ -1,17 +1,21 @@
-"""Filter Marsdog retargeted CSVs down to the 21 actuated joints.
+"""Filter Marsdog retargeted CSVs down to the current 21 command joints.
 
-The full retargeted CSV layout is expected to be:
-  [0:7]  root pose = x, y, z, qx, qy, qz, qw
-  [7:52] 45 joint columns, including passive tail and tarsus joints
+Supported input layouts:
+  - 30 columns from dison.bvh:
+    [0:7] root pose = x, y, z, qx, qy, qz, qw
+    [7:30] MuJoCo hinge qpos, including passive rear tarsus joints.
+  - 28 columns already filtered to:
+    root pose + MARSDOG_JOINT_NAMES order.
 
-Training only actuates 21 joints. Passive joints are reconstructed by MuJoCo
-equality constraints when ``csv_to_npz.py`` writes the active joints to the
-simulation and calls ``sim.forward()``.
+The output is always 28 columns and can be passed directly to
+``mjlab.scripts.csv_to_npz``.  The rear tarsus joints are dropped because they
+are reconstructed by MuJoCo equality constraints; the front tarsus joints are
+kept and moved to the end to match ``MARSDOG_JOINT_NAMES``.
 
 Usage:
   uv run python scripts/tools/filter_marsdog_active_dofs.py \
-    --input-file marsdog_walk.csv \
-    --output-file marsdog_walk_active.csv
+    --input-file src/mjlab/csv/dison.csv \
+    --output-file src/mjlab/csv/dison_active.csv
 """
 
 from __future__ import annotations
@@ -19,13 +23,18 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-FULL_COLUMN_COUNT = 52
+DISON_COLUMN_COUNT = 30
 ACTIVE_COLUMN_COUNT = 28
 
-# Keep root pose and the 21 actuated joints. Indices follow the retargeted CSV
-# table: root columns 0-6, tail1 at 7-8, active robot joints at 31-33, 35-37,
-# and 39-51. Passive tail2-tail12 and rear tarsus columns are dropped.
-ACTIVE_COLUMN_INDICES: tuple[int, ...] = (
+# dison.bvh CSV layout:
+#   root: 0-6
+#   qpos: rl hip/thigh/calf/tarsus, rr hip/thigh/calf/tarsus, waist, head,
+#         fl hip/thigh/calf/tarsus, fr hip/thigh/calf/tarsus
+#
+# csv_to_npz.py writes these values into MARSDOG_JOINT_NAMES, whose current
+# order keeps front tarsus joints at the end.  This is therefore not a plain
+# deletion of columns 10 and 14; it is a deletion plus reorder.
+DISON_TO_ACTIVE_COLUMN_INDICES: tuple[int, ...] = (
   0,
   1,
   2,
@@ -35,25 +44,25 @@ ACTIVE_COLUMN_INDICES: tuple[int, ...] = (
   6,
   7,
   8,
-  31,
-  32,
-  33,
-  35,
-  36,
-  37,
-  39,
-  40,
-  41,
-  42,
-  43,
-  44,
-  45,
-  46,
-  47,
-  48,
-  49,
-  50,
-  51,
+  9,
+  11,
+  12,
+  13,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  26,
+  27,
+  28,
+  25,
+  29,
 )
 
 ACTIVE_COLUMN_NAMES: tuple[str, ...] = (
@@ -64,8 +73,6 @@ ACTIVE_COLUMN_NAMES: tuple[str, ...] = (
   "root_qy",
   "root_qz",
   "root_qw",
-  "tail1_pitch_joint",
-  "tail1_yaw_joint",
   "rl_hip_joint",
   "rl_thigh_joint",
   "rl_calf_joint",
@@ -85,7 +92,12 @@ ACTIVE_COLUMN_NAMES: tuple[str, ...] = (
   "fr_hip_pitch_joint",
   "fr_thigh_roll_joint",
   "fr_calf_joint",
+  "fl_tarsus_joint",
+  "fr_tarsus_joint",
 )
+
+assert len(DISON_TO_ACTIVE_COLUMN_INDICES) == ACTIVE_COLUMN_COUNT
+assert len(ACTIVE_COLUMN_NAMES) == ACTIVE_COLUMN_COUNT
 
 
 def _default_output_path(input_path: Path) -> Path:
@@ -93,7 +105,7 @@ def _default_output_path(input_path: Path) -> Path:
 
 
 def filter_active_dofs(input_path: Path, output_path: Path) -> int:
-  """Write a CSV with only root pose and the 21 actuated Marsdog joints."""
+  """Write root pose plus joints in ``MARSDOG_JOINT_NAMES`` order."""
   rows_written = 0
   with (
     input_path.open("r", encoding="utf-8") as src,
@@ -108,13 +120,15 @@ def filter_active_dofs(input_path: Path, output_path: Path) -> int:
       fields = stripped.split(",")
       if len(fields) == ACTIVE_COLUMN_COUNT:
         # Already filtered. Preserve the row so rerunning the tool is harmless.
+        # The expected order is printed by --print-columns.
         selected = fields
-      elif len(fields) == FULL_COLUMN_COUNT:
-        selected = [fields[idx] for idx in ACTIVE_COLUMN_INDICES]
+      elif len(fields) == DISON_COLUMN_COUNT:
+        selected = [fields[idx] for idx in DISON_TO_ACTIVE_COLUMN_INDICES]
       else:
         raise ValueError(
           f"Line {line_no} has {len(fields)} columns, expected "
-          f"{FULL_COLUMN_COUNT} full columns or {ACTIVE_COLUMN_COUNT} active columns."
+          f"{DISON_COLUMN_COUNT} dison columns or "
+          f"{ACTIVE_COLUMN_COUNT} active columns."
         )
 
       dst.write(",".join(selected) + "\n")
@@ -130,8 +144,8 @@ def main() -> None:
   parser.add_argument(
     "--input-file",
     type=Path,
-    default=Path("marsdog_walk.csv"),
-    help="Input Marsdog retargeted CSV with 52 columns.",
+    default=Path("src/mjlab/csv/dison.csv"),
+    help="Input Marsdog CSV with 30 dison columns or 28 filtered columns.",
   )
   parser.add_argument(
     "--output-file",

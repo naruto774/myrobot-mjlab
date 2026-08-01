@@ -54,6 +54,8 @@ class PlayConfig:
   """Disable all termination conditions (useful for viewing motions with dummy agents)."""
   save_rollout_csv: str | None = None
   """If set, save actor observations and actions to this CSV path during play."""
+  save_torque_csv: str | None = None
+  """If set, save actuated-joint output torques to this CSV path during play."""
   rollout_obs_group: str = "actor"
   """Observation group to record when ``save_rollout_csv`` is set."""
   rollout_env_id: int = 0
@@ -115,6 +117,54 @@ def _wrap_policy_for_rollout_csv(
     )
 
   return RecordingPolicy(), flush
+
+
+def _wrap_policy_for_torque_csv(
+  policy: PolicyProtocol,
+  *,
+  joint_names: tuple[str, ...],
+  read_torques: Callable[[], torch.Tensor],
+  step_dt: float,
+) -> tuple[PolicyProtocol, Callable[[str], None]]:
+  """Wrap a policy to record joint-side applied torques at each control step."""
+  rows: list[list[float]] = []
+
+  class TorqueRecordingPolicy:
+    def __call__(self, obs: Any) -> torch.Tensor:
+      torques = read_torques().detach().cpu().tolist()
+      if len(torques) != len(joint_names):
+        raise ValueError(
+          f"Torque dimension mismatch: got {len(torques)}, expected {len(joint_names)}"
+        )
+      rows.append(torques)
+      return policy(obs)
+
+    def reset(self) -> None:
+      rows.clear()
+      reset_fn = getattr(policy, "reset", None)
+      if reset_fn is not None:
+        reset_fn()
+
+  def flush(path: str) -> None:
+    if not rows:
+      print("[WARN]: No torque rows recorded; CSV not written.")
+      return
+    output_path = Path(path).expanduser().resolve()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", newline="") as f:
+      writer = csv.writer(f)
+      writer.writerow(
+        ["step", "time_s"]
+        + [f"torque_{i}_{name}_Nm" for i, name in enumerate(joint_names)]
+      )
+      for step, torque_row in enumerate(rows):
+        writer.writerow([step, step * step_dt] + torque_row)
+    print(
+      f"[INFO]: Saved joint torque CSV to {output_path} "
+      f"(steps={len(rows)}, joints={len(joint_names)})"
+    )
+
+  return TorqueRecordingPolicy(), flush
 
 
 def run_play(task_id: str, cfg: PlayConfig):
@@ -341,16 +391,34 @@ def run_play(task_id: str, cfg: PlayConfig):
       )
 
   flush_rollout_csv: Callable[[str], None] | None = None
-  if cfg.save_rollout_csv is not None:
+  flush_torque_csv: Callable[[str], None] | None = None
+  if cfg.save_rollout_csv is not None or cfg.save_torque_csv is not None:
     if not (0 <= cfg.rollout_env_id < env.num_envs):
       env.close()
       raise ValueError(
         f"rollout_env_id out of range: {cfg.rollout_env_id} (num_envs={env.num_envs})"
       )
+  if cfg.save_rollout_csv is not None:
     policy, flush_rollout_csv = _wrap_policy_for_rollout_csv(
       policy,
       obs_group=cfg.rollout_obs_group,
       env_id=cfg.rollout_env_id,
+    )
+  if cfg.save_torque_csv is not None:
+    robot = env.unwrapped.scene["robot"]
+    joint_ids, joint_names = robot.find_joints_by_actuator_names((".*",))
+    torque_env_id = cfg.rollout_env_id
+
+    def read_torques() -> torch.Tensor:
+      # qfrc_actuator is the applied low-side joint torque, including MuJoCo's
+      # actuator force clipping. This is the quantity comparable to real joints.
+      return robot.data.qfrc_actuator[torque_env_id, joint_ids]
+
+    policy, flush_torque_csv = _wrap_policy_for_torque_csv(
+      policy,
+      joint_names=tuple(joint_names),
+      read_torques=read_torques,
+      step_dt=env.unwrapped.step_dt,
     )
 
   # Handle "auto" viewer selection.
@@ -371,6 +439,8 @@ def run_play(task_id: str, cfg: PlayConfig):
   finally:
     if flush_rollout_csv is not None and cfg.save_rollout_csv is not None:
       flush_rollout_csv(cfg.save_rollout_csv)
+    if flush_torque_csv is not None and cfg.save_torque_csv is not None:
+      flush_torque_csv(cfg.save_torque_csv)
 
   env.close()
 

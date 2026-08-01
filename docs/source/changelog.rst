@@ -2,6 +2,20 @@
 Changelog
 =========
 
+Upcoming version (not yet released)
+-----------------------------------
+
+Added
+^^^^^
+
+- Added Marsdog-without-tarsus velocity tasks
+  (``Mjlab-Velocity-Flat-Marsdog-Without-Tarsus``,
+  ``Mjlab-Velocity-Rough-Marsdog-Without-Tarsus``). Front tarsus joints are
+  locked via equality constraints and are not part of the action space.
+
+- Added Unitree Go2 flat motion-tracking tasks, including a no-state-estimation
+  actor configuration and conservative Sim-to-Real domain randomization.
+
 Version 1.4.0 (May 26, 2026)
 ----------------------------
 
@@ -32,6 +46,8 @@ Added
   scripts for choosing where training logs are stored. Defaults to
   ``logs/rsl_rl`` (unchanged behavior). Useful for directing outputs to a
   scratch disk or shared mount.
+- Added ``--save-torque-csv`` to ``play`` for recording each actuated joint's
+  applied low-side output torque in action order.
 - ``RewardManager``, ``TerminationManager``, and ``MetricsManager`` now
   validate that every term function returns a tensor of shape
   ``(num_envs,)`` when evaluated, raising a clear ``ValueError``
@@ -65,6 +81,11 @@ Added
 Changed
 ^^^^^^^
 
+- Marsdog motion tracking now validates named joint/body metadata in motion
+  archives, runs each training episode for the full reference clip, tracks the
+  complete leg and head/neck kinematic chains, clips head/neck targets to safe
+  expert-motion ranges, and uses quadruped-specific fall/contact termination
+  thresholds.
 - ``Entity`` now raises a clear error at construction when its spec contains
   more than one freejoint. An entity models a single system rooted at one
   body, so it has at most one freejoint; a second one was previously accepted

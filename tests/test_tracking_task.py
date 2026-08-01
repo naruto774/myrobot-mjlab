@@ -1,11 +1,15 @@
 """Tests specific to motion tracking tasks."""
 
+from pathlib import Path
+
+import numpy as np
 import pytest
+import torch
 
 from mjlab.asset_zoo.robots import G1_ACTION_SCALE
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.tasks.registry import list_tasks, load_env_cfg
-from mjlab.tasks.tracking.mdp import MotionCommandCfg
+from mjlab.tasks.tracking.mdp import MotionCommandCfg, MotionLoader
 
 
 @pytest.fixture(scope="module")
@@ -132,3 +136,59 @@ def test_g1_tracking_has_correct_action_scale(g1_tracking_task_ids: list[str]) -
     assert joint_pos_action.scale == G1_ACTION_SCALE, (
       f"Task {task_id} action scale mismatch, expected G1_ACTION_SCALE"
     )
+
+
+def test_marsdog_tracking_uses_quadruped_safety_config() -> None:
+  """Marsdog tracking should cover each leg chain and reject fallen states."""
+  cfg = load_env_cfg("Mjlab-Tracking-Flat-marsdog-No-State-Estimation")
+  motion_cmd = cfg.commands["motion"]
+  assert isinstance(motion_cmd, MotionCommandCfg)
+
+  assert motion_cmd.align_episode_length_to_motion
+  assert {
+    "rl_hip_link",
+    "rr_hip_link",
+    "fl_thigh_roll_link",
+    "fr_thigh_roll_link",
+  }.issubset(motion_cmd.body_names)
+  assert cfg.rewards["self_collisions"].weight == -0.5
+  assert cfg.rewards["motion_head_neck_joint_pos"].weight == 0.4
+  assert cfg.rewards["motion_head_neck_joint_vel"].weight == 0.05
+  assert cfg.terminations["anchor_pos"].params["threshold"] == 0.15
+  assert cfg.terminations["ee_body_pos"].params["threshold"] == 0.15
+  assert "illegal_body_contact" in cfg.terminations
+  assert "nan_detection" in cfg.terminations
+
+  joint_pos_action = cfg.actions["joint_pos"]
+  assert isinstance(joint_pos_action, JointPositionActionCfg)
+  assert joint_pos_action.clip is not None
+  assert joint_pos_action.clip["head_roll_joint"] == (-0.8, 0.4)
+
+
+def test_motion_loader_reorders_named_archive(tmp_path: Path) -> None:
+  """Name metadata should make motion archives independent of model ordering."""
+  archive = tmp_path / "motion.npz"
+  body_vector = np.array([[[2.0, 0.0, 0.0], [1.0, 0.0, 0.0]]])
+  np.savez(
+    archive,
+    fps=np.array([50.0]),
+    joint_names=np.array(["joint_b", "joint_a"]),
+    body_names=np.array(["body_b", "body_a"]),
+    joint_pos=np.array([[2.0, 1.0]]),
+    joint_vel=np.array([[20.0, 10.0]]),
+    body_pos_w=body_vector,
+    body_quat_w=np.zeros((1, 2, 4)),
+    body_lin_vel_w=body_vector,
+    body_ang_vel_w=body_vector,
+  )
+
+  loader = MotionLoader(
+    str(archive),
+    torch.tensor([0, 1]),
+    joint_names=("joint_a", "joint_b"),
+    body_names=("body_a", "body_b"),
+  )
+
+  torch.testing.assert_close(loader.joint_pos, torch.tensor([[1.0, 2.0]]))
+  torch.testing.assert_close(loader.joint_vel, torch.tensor([[10.0, 20.0]]))
+  torch.testing.assert_close(loader.body_pos_w[..., 0], torch.tensor([[1.0, 2.0]]))

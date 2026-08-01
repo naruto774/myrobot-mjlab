@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Literal
 
@@ -35,29 +36,80 @@ _DESIRED_FRAME_COLORS = ((1.0, 0.5, 0.5), (0.5, 1.0, 0.5), (0.5, 0.5, 1.0))
 
 class MotionLoader:
   def __init__(
-    self, motion_file: str, body_indexes: torch.Tensor, device: str = "cpu"
+    self,
+    motion_file: str,
+    body_indexes: torch.Tensor,
+    joint_names: Sequence[str],
+    body_names: Sequence[str],
+    device: str = "cpu",
   ) -> None:
-    data = np.load(motion_file)
-    self.joint_pos = torch.tensor(data["joint_pos"], dtype=torch.float32, device=device)
-    self.joint_vel = torch.tensor(data["joint_vel"], dtype=torch.float32, device=device)
-    self._body_pos_w = torch.tensor(
-      data["body_pos_w"], dtype=torch.float32, device=device
-    )
-    self._body_quat_w = torch.tensor(
-      data["body_quat_w"], dtype=torch.float32, device=device
-    )
-    self._body_lin_vel_w = torch.tensor(
-      data["body_lin_vel_w"], dtype=torch.float32, device=device
-    )
-    self._body_ang_vel_w = torch.tensor(
-      data["body_ang_vel_w"], dtype=torch.float32, device=device
-    )
+    with np.load(motion_file, allow_pickle=False) as data:
+      joint_order = self._resolve_archive_order(
+        data, "joint_names", joint_names, data["joint_pos"].shape[1]
+      )
+      body_order = self._resolve_archive_order(
+        data, "body_names", body_names, data["body_pos_w"].shape[1]
+      )
+
+      self.fps = float(np.asarray(data["fps"]).reshape(-1)[0])
+      self.joint_pos = torch.tensor(
+        data["joint_pos"][:, joint_order], dtype=torch.float32, device=device
+      )
+      self.joint_vel = torch.tensor(
+        data["joint_vel"][:, joint_order], dtype=torch.float32, device=device
+      )
+      self._body_pos_w = torch.tensor(
+        data["body_pos_w"][:, body_order], dtype=torch.float32, device=device
+      )
+      self._body_quat_w = torch.tensor(
+        data["body_quat_w"][:, body_order], dtype=torch.float32, device=device
+      )
+      self._body_lin_vel_w = torch.tensor(
+        data["body_lin_vel_w"][:, body_order], dtype=torch.float32, device=device
+      )
+      self._body_ang_vel_w = torch.tensor(
+        data["body_ang_vel_w"][:, body_order], dtype=torch.float32, device=device
+      )
     self._body_indexes = body_indexes
     self.body_pos_w = self._body_pos_w[:, self._body_indexes]
     self.body_quat_w = self._body_quat_w[:, self._body_indexes]
     self.body_lin_vel_w = self._body_lin_vel_w[:, self._body_indexes]
     self.body_ang_vel_w = self._body_ang_vel_w[:, self._body_indexes]
     self.time_step_total = self.joint_pos.shape[0]
+
+  @staticmethod
+  def _resolve_archive_order(
+    data: np.lib.npyio.NpzFile,
+    names_key: str,
+    expected_names: Sequence[str],
+    data_width: int,
+  ) -> list[int]:
+    """Map optional archive name metadata into the current Entity order."""
+    expected = tuple(expected_names)
+    if names_key not in data:
+      if data_width != len(expected):
+        raise ValueError(
+          f"Motion archive has {data_width} entries for {names_key.removesuffix('_names')}, "
+          f"but the robot expects {len(expected)}. The archive has no {names_key} "
+          "metadata, so it cannot be reordered safely."
+        )
+      return list(range(data_width))
+
+    archive = tuple(
+      name.decode() if isinstance(name, bytes) else str(name)
+      for name in np.asarray(data[names_key]).reshape(-1)
+    )
+    if len(set(archive)) != len(archive):
+      raise ValueError(f"Motion archive {names_key} contains duplicate names.")
+    if set(archive) != set(expected):
+      missing = sorted(set(expected) - set(archive))
+      extra = sorted(set(archive) - set(expected))
+      raise ValueError(
+        f"Motion archive {names_key} does not match the robot. "
+        f"Missing: {missing}; extra: {extra}."
+      )
+    index_by_name = {name: index for index, name in enumerate(archive)}
+    return [index_by_name[name] for name in expected]
 
 
 class MotionCommand(CommandTerm):
@@ -79,8 +131,22 @@ class MotionCommand(CommandTerm):
     )
 
     self.motion = MotionLoader(
-      self.cfg.motion_file, self.body_indexes, device=self.device
+      self.cfg.motion_file,
+      self.body_indexes,
+      self.robot.joint_names,
+      self.robot.body_names,
+      device=self.device,
     )
+    expected_fps = 1.0 / env.step_dt
+    if not math.isclose(self.motion.fps, expected_fps, rel_tol=1.0e-5):
+      raise ValueError(
+        f"Motion FPS ({self.motion.fps:g}) must match the control frequency "
+        f"({expected_fps:g} Hz)."
+      )
+    if self.cfg.align_episode_length_to_motion:
+      # Termination is evaluated before the command advances, so N control steps
+      # score all N reference frames and reset before the command can wrap.
+      env.cfg.episode_length_s = self.motion.time_step_total * env.step_dt
     self.time_steps = torch.zeros(self.num_envs, dtype=torch.long, device=self.device)
     self.body_pos_relative_w = torch.zeros(
       self.num_envs, len(cfg.body_names), 3, device=self.device
@@ -592,6 +658,7 @@ class MotionCommandCfg(CommandTermCfg):
   adaptive_uniform_ratio: float = 0.1
   adaptive_alpha: float = 0.001
   sampling_mode: Literal["adaptive", "uniform", "start"] = "adaptive"
+  align_episode_length_to_motion: bool = False
 
   @dataclass
   class VizCfg:

@@ -12,11 +12,15 @@ from mjlab.envs.mdp import dr
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.observation_manager import ObservationGroupCfg
+from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.scene_entity_config import SceneEntityCfg
+from mjlab.managers.termination_manager import TerminationTermCfg
 from mjlab.sensor import ContactMatch, ContactSensorCfg
 from mjlab.tasks.tracking import mdp
 from mjlab.tasks.tracking.mdp import MotionCommandCfg
 from mjlab.tasks.tracking.tracking_env_cfg import make_tracking_env_cfg
+
+from . import rewards as marsdog_rewards
 
 
 def _add_marsdog_step(spec: mujoco.MjSpec) -> None:
@@ -39,9 +43,9 @@ def marsdog_flat_tracking_env_cfg(
   """Create marsdog flat terrain tracking configuration."""
   cfg = make_tracking_env_cfg()
   cfg.sim.nconmax = None
-  cfg.sim.njmax = 2048
+  cfg.sim.njmax = 600
   cfg.sim.contact_sensor_maxmatch = 192
-  cfg.scene.spec_fn = _add_marsdog_step
+  # cfg.scene.spec_fn = _add_marsdog_step
   cfg.scene.entities = {"robot": get_marsdog_robot_cfg()}
   # The reference motion uses a single fixed step at a world-space location, but
   # the step geom lives in the shared model and is not replicated per env. With a
@@ -52,6 +56,51 @@ def marsdog_flat_tracking_env_cfg(
   # collide across envs.
   cfg.scene.env_spacing = 0.0
 
+  foot_names = ("fr", "fl", "rr", "rl")
+  feet_site_names = ("fr", "fl", "rr", "rl")
+  feet_body_names = (
+    "fl_foot_link",
+    "fr_foot_link",
+    "rl_foot_link",
+    "rr_foot_link",
+  )
+  leg_body_names = (
+    "rl_hip_link",
+    "rl_thigh_link",
+    "rl_calf_link",
+    "rr_hip_link",
+    "rr_thigh_link",
+    "rr_calf_link",
+    "fl_hip_pitch_link",
+    "fl_thigh_roll_link",
+    "fl_calf_link",
+    "fr_hip_pitch_link",
+    "fr_thigh_roll_link",
+    "fr_calf_link",
+  )
+  leg_joint_names = (
+    r".*(fr|fl|rr|rl).*(hip|thigh|calf).*",
+    r".*(fr|fl).*tarsus.*",
+  )
+  head_neck_joint_names = (
+    "neck_pitch_joint",
+    "head_roll_joint",
+    "head_yaw_joint",
+    "head_pitch_joint",
+  )
+  feet_ground_cfg = ContactSensorCfg(
+    name="feet_ground_contact",
+    primary=ContactMatch(
+      mode="geom",
+      pattern=tuple(f"{name}_foot_collision" for name in foot_names),
+      entity="robot",
+    ),
+    secondary=ContactMatch(mode="body", pattern="terrain"),
+    fields=("found", "force"),
+    reduce="netforce",
+    num_slots=1,
+    track_air_time=True,
+  )
   self_collision_cfg = ContactSensorCfg(
     name="self_collision",
     primary=ContactMatch(mode="subtree", pattern="base_link", entity="robot"),
@@ -61,34 +110,166 @@ def marsdog_flat_tracking_env_cfg(
     num_slots=1,
     history_length=4,
   )
-  cfg.scene.sensors = (self_collision_cfg,)
+  illegal_body_contact_cfg = ContactSensorCfg(
+    name="illegal_body_contact",
+    primary=ContactMatch(
+      mode="body",
+      pattern=(
+        "base_link",
+        "rl_thigh_link",
+        "rr_thigh_link",
+        "fl_thigh_roll_link",
+        "fr_thigh_roll_link",
+      ),
+      entity="robot",
+    ),
+    secondary=ContactMatch(mode="body", pattern="terrain"),
+    fields=("found", "force"),
+    reduce="maxforce",
+    num_slots=1,
+    history_length=4,
+  )
+  cfg.scene.sensors = (
+    feet_ground_cfg,
+    self_collision_cfg,
+    illegal_body_contact_cfg,
+  )
 
   joint_pos_action = cfg.actions["joint_pos"]
   assert isinstance(joint_pos_action, JointPositionActionCfg)
   joint_pos_action.scale = MARSDOG_ACTION_SCALE
+  # Clip processed position targets to the expert envelope plus a small margin.
+  # This prevents untracked upper-body actions from drifting toward MJCF limits.
+  joint_pos_action.clip = {
+    "neck_pitch_joint": (-0.58, 0.45),
+    "head_roll_joint": (-0.8, 0.4),
+    "head_yaw_joint": (-1.3, 0.6),
+    "head_pitch_joint": (-0.6, 0.5),
+  }
 
   motion_cmd = cfg.commands["motion"]
   assert isinstance(motion_cmd, MotionCommandCfg)
   motion_cmd.anchor_body_name = "base_link"
+  motion_cmd.sampling_mode = "start"
+  motion_cmd.align_episode_length_to_motion = True
+  motion_cmd.pose_range = {}
+  motion_cmd.velocity_range = {}
+  motion_cmd.joint_position_range = (0.0, 0.0)
+
   motion_cmd.body_names = (
     "base_link",  # anchor
     "waist_yaw_link",
     "waist_pitch_link",
     "neck_pitch_link",
     "head_pitch_link",
+    "rl_hip_link",
     "rl_thigh_link",
     "rl_calf_link",
     "rl_foot_link",
+    "rr_hip_link",
     "rr_thigh_link",
     "rr_calf_link",
     "rr_foot_link",
     "fl_hip_pitch_link",
+    "fl_thigh_roll_link",
     "fl_calf_link",
     "fl_foot_link",
     "fr_hip_pitch_link",
+    "fr_thigh_roll_link",
     "fr_calf_link",
     "fr_foot_link",
   )
+
+  # Marsdog tracking reward layout:
+  # - base/root terms keep the body height and attitude aligned with the motion;
+  # - foot terms dominate spatial imitation because contacts define quadruped gait;
+  # - leg joint terms preserve the expert kinematic phase without constraining
+  #   head/neck/waist joints too tightly for sim-to-real deployment.
+  cfg.rewards["motion_global_root_pos"] = RewardTermCfg(
+    func=marsdog_rewards.motion_anchor_height_error_exp,
+    weight=0.8,
+    params={"command_name": "motion", "std": 0.05},
+  )
+  cfg.rewards["motion_global_root_ori"].weight = 0.8
+  cfg.rewards["motion_global_root_ori"].params["std"] = 0.35
+  cfg.rewards["motion_body_pos"].weight = 1.2
+  cfg.rewards["motion_body_pos"].params = {
+    "command_name": "motion",
+    "std": 0.08,
+    "body_names": feet_body_names,
+  }
+  cfg.rewards["motion_body_ori"].weight = 0.2
+  cfg.rewards["motion_body_ori"].params = {
+    "command_name": "motion",
+    "std": 0.6,
+    "body_names": leg_body_names,
+  }
+  cfg.rewards["motion_body_lin_vel"].weight = 0.4
+  cfg.rewards["motion_body_lin_vel"].params = {
+    "command_name": "motion",
+    "std": 1.0,
+    "body_names": feet_body_names,
+  }
+  cfg.rewards["motion_body_ang_vel"].weight = 0.1
+  cfg.rewards["motion_body_ang_vel"].params = {
+    "command_name": "motion",
+    "std": 3.14,
+    "body_names": ("base_link",),
+  }
+  cfg.rewards["motion_joint_pos"] = RewardTermCfg(
+    func=marsdog_rewards.motion_joint_position_error_exp,
+    weight=1.0,
+    params={
+      "command_name": "motion",
+      "std": 0.35,
+      "asset_cfg": SceneEntityCfg("robot", joint_names=leg_joint_names),
+    },
+  )
+  cfg.rewards["motion_joint_vel"] = RewardTermCfg(
+    func=marsdog_rewards.motion_joint_velocity_error_exp,
+    weight=0.2,
+    params={
+      "command_name": "motion",
+      "std": 5.0,
+      "asset_cfg": SceneEntityCfg("robot", joint_names=leg_joint_names),
+    },
+  )
+  # Keep the visually important head/neck phase aligned without letting these
+  # lightweight joints dominate the locomotion objective.
+  cfg.rewards["motion_head_neck_joint_pos"] = RewardTermCfg(
+    func=marsdog_rewards.motion_joint_position_error_exp,
+    weight=0.4,
+    params={
+      "command_name": "motion",
+      "std": 0.25,
+      "asset_cfg": SceneEntityCfg("robot", joint_names=head_neck_joint_names),
+    },
+  )
+  cfg.rewards["motion_head_neck_joint_vel"] = RewardTermCfg(
+    func=marsdog_rewards.motion_joint_velocity_error_exp,
+    weight=0.05,
+    params={
+      "command_name": "motion",
+      "std": 3.0,
+      "asset_cfg": SceneEntityCfg("robot", joint_names=head_neck_joint_names),
+    },
+  )
+  cfg.rewards["feet_slip"] = RewardTermCfg(
+    func=marsdog_rewards.feet_slip_penalty,
+    weight=-0.15,
+    params={
+      "sensor_name": feet_ground_cfg.name,
+      "asset_cfg": SceneEntityCfg("robot", site_names=feet_site_names),
+    },
+  )
+  cfg.rewards["soft_landing"] = RewardTermCfg(
+    func=marsdog_rewards.soft_landing_penalty,
+    weight=-1.0e-4,
+    params={"sensor_name": feet_ground_cfg.name, "force_threshold": 20.0},
+  )
+  cfg.rewards["action_rate_l2"].weight = -0.05
+  # Treat self-contact as a soft safety objective, not a reward-scale cliff.
+  cfg.rewards["self_collisions"].weight = -0.5
 
   cfg.events["foot_friction"].params[
     "asset_cfg"
@@ -96,11 +277,11 @@ def marsdog_flat_tracking_env_cfg(
   cfg.events["base_com"].params["asset_cfg"].body_names = ("waist_yaw_link",)
   # marsdog is lightweight and sensitive to perturbations. Use conservative DR ranges.
   cfg.events["base_com"].params["ranges"] = {
-    0: (-0.008, 0.008),
-    1: (-0.010, 0.010),
-    2: (-0.006, 0.006),
+    0: (-0.00, 0.00),
+    1: (-0.00, 0.00),
+    2: (-0.00, 0.00),
   }
-  cfg.events["encoder_bias"].params["bias_range"] = (-0.005, 0.005)
+  cfg.events["encoder_bias"].params["bias_range"] = (-0.00, 0.00)
   cfg.events["foot_friction"].params["ranges"] = (0.45, 0.90)
 
   # Stiffness/damping randomization. The training model is a perfectly rigid
@@ -117,8 +298,8 @@ def marsdog_flat_tracking_env_cfg(
     mode="startup",
     params={
       "asset_cfg": SceneEntityCfg("robot"),
-      "kp_range": (0.8, 1.0),
-      "kd_range": (0.8, 1.2),
+      "kp_range": (1.0, 1.0),
+      "kd_range": (1.0, 1.0),
       "operation": "scale",
     },
   )
@@ -133,10 +314,10 @@ def marsdog_flat_tracking_env_cfg(
     interval_range_s=(3.0, 6.0),
     params={
       "velocity_range": {
-        "x": (-0.01, 0.01),
-        "y": (-0.01, 0.01),
-        "roll": (-0.01, 0.01),
-        "pitch": (-0.01, 0.01),
+        "x": (-0.0, 0.0),
+        "y": (-0.0, 0.0),
+        "roll": (-0.0, 0.0),
+        "pitch": (-0.0, 0.0),
       }
     },
   )
@@ -149,8 +330,8 @@ def marsdog_flat_tracking_env_cfg(
     func=dr.imu_bias,
     mode="reset",
     params={
-      "ori_range": (-0.09, 0.09),  # (-0.087, 0.087), rad (~5 deg) on roll and pitch.
-      "gyro_range": (-0.05, 0.05),  # (-0.05, 0.05) rad/s per axis.
+      "ori_range": (-0.0, 0.0),  # (-0.087, 0.087), rad (~5 deg) on roll and pitch.
+      "gyro_range": (-0.0, 0.0),  # (-0.05, 0.05) rad/s per axis.
     },
   )
 
@@ -185,6 +366,18 @@ def marsdog_flat_tracking_env_cfg(
     "rl_foot_link",
     "rr_foot_link",
   )
+  cfg.terminations["anchor_pos"].params["threshold"] = 0.15
+  cfg.terminations["anchor_ori"].func = mdp.bad_anchor_ori_angle
+  cfg.terminations["anchor_ori"].params["threshold"] = 1.0472  # 60 degrees.
+  cfg.terminations["ee_body_pos"].params["threshold"] = 0.15
+  cfg.terminations["illegal_body_contact"] = TerminationTermCfg(
+    func=mdp.illegal_contact,
+    params={
+      "sensor_name": illegal_body_contact_cfg.name,
+      "force_threshold": 10.0,
+    },
+  )
+  cfg.terminations["nan_detection"] = TerminationTermCfg(func=mdp.nan_detection)
   cfg.rewards["joint_limit"].params["asset_cfg"] = SceneEntityCfg(
     "robot", joint_names=MARSDOG_JOINT_NAMES
   )

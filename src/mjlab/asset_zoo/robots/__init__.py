@@ -4,6 +4,18 @@ from mjlab.asset_zoo.robots.i2rt_yam.yam_constants import (
 from mjlab.asset_zoo.robots.i2rt_yam.yam_constants import (
   get_yam_robot_cfg as get_yam_robot_cfg,
 )
+from mjlab.asset_zoo.robots.marsdog.marsdog_constants import (
+  MARSDOG_ACTION_SCALE as MARSDOG_ACTION_SCALE,
+)
+from mjlab.asset_zoo.robots.marsdog.marsdog_constants import (
+  get_marsdog_robot_cfg as get_marsdog_robot_cfg,
+)
+from mjlab.asset_zoo.robots.marsdog_without_tarsus.marsdog_without_tarsus_constants import (
+  MARSDOG_WITHOUT_TARSUS_ACTION_SCALE as MARSDOG_WITHOUT_TARSUS_ACTION_SCALE,
+)
+from mjlab.asset_zoo.robots.marsdog_without_tarsus.marsdog_without_tarsus_constants import (
+  get_marsdog_without_tarsus_robot_cfg as get_marsdog_without_tarsus_robot_cfg,
+)
 from mjlab.asset_zoo.robots.myrobot.myrobot_constants import (
   MYROBOT_ACTION_SCALE as MYROBOT_ACTION_SCALE,
 )
@@ -25,9 +37,9 @@ from mjlab.asset_zoo.robots.unitree_go1.go1_constants import (
 from mjlab.asset_zoo.robots.unitree_go1.go1_constants import (
   get_go1_robot_cfg as get_go1_robot_cfg,
 )
-from mjlab.asset_zoo.robots.marsdog.marsdog_constants import (
-  MARSDOG_ACTION_SCALE as MARSDOG_ACTION_SCALE,
+from mjlab.asset_zoo.robots.unitree_go2.go2_constants import (
+  GO2_ACTION_SCALE as GO2_ACTION_SCALE,
 )
-from mjlab.asset_zoo.robots.marsdog.marsdog_constants import (
-  get_marsdog_robot_cfg as get_marsdog_robot_cfg,
+from mjlab.asset_zoo.robots.unitree_go2.go2_constants import (
+  get_go2_robot_cfg as get_go2_robot_cfg,
 )

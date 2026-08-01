@@ -206,6 +206,9 @@ def run_sim(
 
   log: dict[str, Any] = {
     "fps": [output_fps],
+    # Persist names so tracking can validate/reorder archives after MJCF changes.
+    "joint_names": np.asarray(robot.joint_names),
+    "body_names": np.asarray(robot.body_names),
     "joint_pos": [],
     "joint_vel": [],
     "body_pos_w": [],

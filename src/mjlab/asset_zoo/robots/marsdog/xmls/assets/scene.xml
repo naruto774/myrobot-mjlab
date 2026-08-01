@@ -20,7 +20,7 @@
   <worldbody>
     <!-- 机器人前方 box 台阶-->
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
-    <geom name="floor" pos="0 0 -0.25" size="0 0 0.05" type="plane" material="groundplane" />
-    <geom name="step1" type="box" size="0.8 0.40 0.3" pos="0 -1.9 0.02" material="step" friction="0.8 0.005 0.0001" />
+    <geom name="floor" pos="0 0 -0.27" size="0 0 0.05" type="plane" material="groundplane" />
+    <!-- <geom name="step1" type="box" size="0.8 0.40 0.3" pos="0 -1.9 0.02" material="step" friction="0.8 0.005 0.0001" /> -->
   </worldbody>
 </mujoco>
