@@ -1,5 +1,4 @@
 import mujoco
-import numpy as np
 
 model = mujoco.MjModel.from_xml_path(
   "src/mjlab/asset_zoo/robots/marsdog/xmls/assets/marsdog.xml"

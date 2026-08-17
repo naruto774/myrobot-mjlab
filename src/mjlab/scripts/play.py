@@ -17,6 +17,7 @@ from mjlab.envs import ManagerBasedRlEnv
 from mjlab.rl import MjlabOnPolicyRunner, RslRlVecEnvWrapper
 from mjlab.scripts._cli import maybe_print_top_level_help
 from mjlab.tasks.registry import list_tasks, load_env_cfg, load_rl_cfg, load_runner_cls
+from mjlab.tasks.style.mdp.commands import StyleCommandCfg
 from mjlab.tasks.tracking.mdp import MotionCommandCfg
 from mjlab.utils.os import get_wandb_checkpoint_path
 from mjlab.utils.torch import configure_torch_backends
@@ -239,6 +240,20 @@ def run_play(task_id: str, cfg: PlayConfig):
           if art is None:
             raise RuntimeError("No motion artifact found in the run.")
           motion_cmd.motion_file = str(Path(art.download()) / "motion.npz")
+
+  is_style_task = "style" in env_cfg.commands and isinstance(
+    env_cfg.commands["style"], StyleCommandCfg
+  )
+  if is_style_task:
+    style_cmd = env_cfg.commands["style"]
+    assert isinstance(style_cmd, StyleCommandCfg)
+    if cfg.motion_file is None or not Path(cfg.motion_file).exists():
+      raise ValueError(
+        "Style tasks require a local tiled motion npz:\n"
+        "  --motion-file /path/to/xingzou_style.npz"
+      )
+    print(f"[INFO]: Using style motion file: {cfg.motion_file}")
+    style_cmd.motion_file = cfg.motion_file
 
   log_dir: Path | None = None
   resume_path: Path | None = None

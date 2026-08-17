@@ -2,23 +2,25 @@
 <!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
      Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<!-- Inertial parameters patched from SolidWorks mass properties (质量属性.md).
+     Used CoM-aligned L tensor with product-of-inertia sign flip for URDF. -->
 <robot
   name="marsdog">
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="-0.013554 0.000373 0.001080"
+        xyz="-0.02697403 0.00018683 -0.00540412"
         rpy="0 0 0" />
       <mass
-        value="2.875" />
+        value="1.43861788" />
       <inertia
-        ixx="0.008005838"
-        ixy="0.000066867"
-        ixz="0.003619324"
-        iyy="0.013668028"
-        iyz="-0.000048830"
-        izz="0.009240322" />
+        ixx="0.00181332"
+        ixy="1.493e-05"
+        ixz="0.00017964"
+        iyy="0.00387251"
+        iyz="-1.713e-05"
+        izz="0.00397914" />
     </inertial>
     <visual>
       <origin
@@ -29,29 +31,15 @@
           filename="package://marsdog/meshes/base_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <visual>
-      <origin
-        xyz="0.0350059 0 -0.065279"
-        rpy="0 0 0" />
-      <geometry>
-        <box
-          size="0.09 0.10 0.06" />
-      </geometry>
-      <material
-        name="battery">
-        <color
-          rgba="0.15 0.15 0.15 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.021722 0.0335 -0.009186"
-        rpy="0 1.22172569 0" />
+        xyz="-0.033 0.0335 -0.0247"
+        rpy="0 1.0472 0" />
       <geometry>
         <cylinder
           length="0.07"
@@ -60,8 +48,8 @@
     </collision>
     <collision>
       <origin
-        xyz="-0.021722 -0.0335 -0.009186"
-        rpy="0 1.22172569 0" />
+        xyz="-0.033 -0.0335 -0.0247"
+        rpy="0 1.0472 0" />
       <geometry>
         <cylinder
           length="0.07"
@@ -70,16 +58,16 @@
     </collision>
     <collision>
       <origin
-        xyz="-0.081722 0 0.0462"
+        xyz="-0.055 0 0.01"
         rpy="0 0 0" />
       <geometry>
         <box
-          size="0.149 0.065 0.075" />
+          size="0.14 0.065 0.08" />
       </geometry>
     </collision>
     <collision>
       <origin
-        xyz="0.030059 0 0.028279"
+        xyz="0.0205 0 0"
         rpy="0 1.57079632679 0" />
       <geometry>
         <cylinder
@@ -87,1300 +75,22 @@
           radius="0.04" />
       </geometry>
     </collision>
-    <collision>
-      <origin
-        xyz="0.0350059 0 -0.065279"
-        rpy="0 0 0" />
-      <geometry>
-        <box
-          size="0.09 0.10 0.06" />
-      </geometry>
-    </collision>
   </link>
-  <link
-    name="imu_link">
-    <inertial>
-      <origin
-        xyz="-6.93889390390723E-18 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="2.51327412287186E-05" />
-      <inertia
-        ixx="3.35103216382916E-11"
-        ixy="1.5694542800438E-43"
-        ixz="1.20912661957474E-27"
-        iyy="3.35103216382916E-11"
-        iyz="-4.41762106923767E-28"
-        izz="5.02654824574372E-11" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/imu_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/imu_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="imu_joint"
-    type="fixed">
-    <origin
-      xyz="0.034059 -0.00020534 -0.015067"
-      rpy="-0.001365 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="imu_link" />
-    <axis
-      xyz="0 0 0" />
-  </joint>
-  <link
-    name="tail1_link">
-    <inertial>
-      <origin
-        xyz="-0.00762274422412546 4.59468082539272E-08 8.03588656728138E-09"
-        rpy="0 0 0" />
-      <mass
-        value="0.0141851775235556" />
-      <inertia
-        ixx="8.34744427360573E-07"
-        ixy="4.83516448208726E-12"
-        ixz="-8.10571938743082E-12"
-        iyy="6.99096415891827E-07"
-        iyz="-8.1465996643223E-12"
-        izz="6.99051973482161E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail1_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00899 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0223"
-          radius="0.0112" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail1_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.16794 -8.4332E-05 0.033174"
-      rpy="-0.00029343 -0.13963 0.00083919" />
-    <parent
-      link="base_link" />
-    <child
-      link="tail1_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-0.3"
-      upper="0.3"
-      effort="6"
-      velocity="10.472" />
-  </joint>
-  <link
-    name="tail1_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail1_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail1_virtual_link" />
-    <child
-      link="tail1_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-0.3"
-      upper="0.3"
-      effort="6"
-      velocity="10.472" />
-  </joint>
-  <link
-    name="tail2_link">
-    <inertial>
-      <origin
-        xyz="-0.00650946186307066 -1.52170692019338E-09 2.7910038724599E-09"
-        rpy="0 0 0" />
-      <mass
-        value="0.0127952179052056" />
-      <inertia
-        ixx="7.00743774263552E-07"
-        ixy="-2.50808859184526E-13"
-        ixz="-4.83067761601916E-13"
-        iyy="5.92152060742917E-07"
-        iyz="-1.10662095911008E-11"
-        izz="5.92123674862296E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail2_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00781 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0216"
-          radius="0.0108" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail2_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.018124 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail1_link" />
-    <child
-      link="tail2_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail2_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail2_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail2_virtual_link" />
-    <child
-      link="tail2_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail3_link">
-    <inertial>
-      <origin
-        xyz="-0.00631416853552891 -4.82119415570748E-08 -7.91465742944197E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.0116835708764158" />
-      <inertia
-        ixx="6.0668791411361E-07"
-        ixy="-3.0889534578389E-12"
-        ixz="-4.86924442197162E-12"
-        iyy="5.11928508664374E-07"
-        iyz="2.46362720395388E-13"
-        izz="5.1192990570307E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail3_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00756 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.021"
-          radius="0.0105" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail3_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0167 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail2_link" />
-    <child
-      link="tail3_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail3_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail3_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail3_virtual_link" />
-    <child
-      link="tail3_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail4_link">
-    <inertial>
-      <origin
-        xyz="-0.0061185438841842 -1.48748220199502E-08 9.01788682616811E-09"
-        rpy="0 0 0" />
-      <mass
-        value="0.0106347694237068" />
-      <inertia
-        ixx="5.23074870443639E-07"
-        ixy="-8.11977613395735E-13"
-        ixz="3.04824638664323E-13"
-        iyy="4.40635446836679E-07"
-        iyz="5.81788845198795E-12"
-        izz="4.40551070538819E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail4_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00731 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0204"
-          radius="0.0102" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail4_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.016 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail3_link" />
-    <child
-      link="tail4_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail4_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail4_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail4_virtual_link" />
-    <child
-      link="tail4_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail5_link">
-    <inertial>
-      <origin
-        xyz="-0.00590663030331451 -2.33051585113442E-08 -1.20618755539148E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.00985155554987781" />
-      <inertia
-        ixx="4.66785983258564E-07"
-        ixy="-1.04372443702653E-12"
-        ixz="1.07564984089307E-13"
-        iyy="3.89047578750144E-07"
-        iyz="-5.17550076333586E-12"
-        izz="3.89031984365247E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail5_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00706 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.02"
-          radius="0.01" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail5_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0157 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail4_link" />
-    <child
-      link="tail5_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail5_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail5_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail5_virtual_link" />
-    <child
-      link="tail5_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail6_link">
-    <inertial>
-      <origin
-        xyz="-0.0056903437316127 5.41744728244087E-09 1.2834479590218E-09"
-        rpy="0 0 0" />
-      <mass
-        value="0.00923075165523409" />
-      <inertia
-        ixx="4.22373239284678E-07"
-        ixy="3.15975255616925E-13"
-        ixz="9.81905658686649E-13"
-        iyy="3.47612621110504E-07"
-        iyz="-5.09145044445086E-12"
-        izz="3.47597874849156E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail6_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00681 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0196"
-          radius="0.0098" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail6_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0152 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail5_link" />
-    <child
-      link="tail6_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail6_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail6_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail6_virtual_link" />
-    <child
-      link="tail6_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail7_link">
-    <inertial>
-      <origin
-        xyz="-0.00549512158168441 4.41705623466238E-10 5.92188553749651E-09"
-        rpy="0 0 0" />
-      <mass
-        value="0.0083927589340141" />
-      <inertia
-        ixx="3.62504640761287E-07"
-        ixy="5.27937408432459E-15"
-        ixz="3.45073339124299E-13"
-        iyy="2.97470779283463E-07"
-        iyz="-4.1907348517631E-12"
-        izz="2.97471433861245E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail7_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00656 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.019"
-          radius="0.0095" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail7_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0147 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail6_link" />
-    <child
-      link="tail7_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail7_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail7_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail7_virtual_link" />
-    <child
-      link="tail7_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail8_link">
-    <inertial>
-      <origin
-        xyz="-0.00563909552581265 4.20880061358098E-08 -1.77922774846628E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.00801677850255402" />
-      <inertia
-        ixx="3.31236320661279E-07"
-        ixy="1.88525085945086E-12"
-        ixz="-6.1350591694735E-13"
-        iyy="2.7967143331277E-07"
-        iyz="-5.43556752743582E-12"
-        izz="2.79664129565631E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail8_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00641 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0184"
-          radius="0.0092" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail8_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0144 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail7_link" />
-    <child
-      link="tail8_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail8_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail8_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail8_virtual_link" />
-    <child
-      link="tail8_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail9_link">
-    <inertial>
-      <origin
-        xyz="-0.00551185736109 -8.70025468335811E-10 -1.1744280548065E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.00782767270242887" />
-      <inertia
-        ixx="3.07000053171084E-07"
-        ixy="-3.31166362575087E-15"
-        ixz="-5.04747137565905E-13"
-        iyy="2.66907201950988E-07"
-        iyz="-2.47028550370464E-12"
-        izz="2.66903344499661E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail9_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00636 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0179"
-          radius="0.009" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail9_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0147 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail8_link" />
-    <child
-      link="tail9_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail9_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail9_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail9_virtual_link" />
-    <child
-      link="tail9_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail10_link">
-    <inertial>
-      <origin
-        xyz="-0.00518800969906508 -1.10405673769964E-08 -2.52233224307119E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.00666177522641977" />
-      <inertia
-        ixx="2.3897663010197E-07"
-        ixy="-3.77806868874636E-13"
-        ixz="-8.43932517675259E-13"
-        iyy="2.06527078390579E-07"
-        iyz="-1.29291438446809E-12"
-        izz="2.06521274479418E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail10_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00600 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0172"
-          radius="0.0086" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail10_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0146 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail9_link" />
-    <child
-      link="tail10_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail10_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail10_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail10_virtual_link" />
-    <child
-      link="tail10_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail11_link">
-    <inertial>
-      <origin
-        xyz="-0.00495915504044836 8.55362992935316E-09 5.3374045183574E-08"
-        rpy="0 0 0" />
-      <mass
-        value="0.0046207645314435" />
-      <inertia
-        ixx="1.44477704901687E-07"
-        ixy="1.71673320006815E-13"
-        ixz="1.52603803639589E-12"
-        iyy="1.4682737778813E-07"
-        iyz="-3.11141554202373E-14"
-        izz="1.07695667986963E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail11_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00546 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.0164"
-          radius="0.0077" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail11_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.0139 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail10_link" />
-    <child
-      link="tail11_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail11_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail11_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail11_virtual_link" />
-    <child
-      link="tail11_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail12_link">
-    <inertial>
-      <origin
-        xyz="-0.00591500067079281 -2.92924372681524E-07 4.29541290314361E-07"
-        rpy="0 0 0" />
-      <mass
-        value="0.00556653973765066" />
-      <inertia
-        ixx="1.74072299338633E-07"
-        ixy="5.73927385554313E-12"
-        ixz="-9.67312946794018E-12"
-        iyy="1.54269355650383E-07"
-        iyz="-1.52040940825198E-11"
-        izz="1.54216751886065E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="package://marsdog/meshes/tail12_link.STL" />
-      </geometry>
-      <material
-        name="default_material">
-        <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="-0.00650 0 0"
-        rpy="0 1.57079632679 0" />
-      <geometry>
-        <cylinder
-          length="0.016"
-          radius="0.008" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="tail12_pitch_joint"
-    type="revolute">
-    <origin
-      xyz="-0.011979 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail11_link" />
-    <child
-      link="tail12_virtual_link" />
-    <axis
-      xyz="0 1 0" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_pitch_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
-  <link
-    name="tail12_virtual_link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0.0001" />
-      <inertia
-        ixx="1e-9"
-        ixy="0"
-        ixz="0"
-        iyy="1e-9"
-        iyz="0"
-        izz="1e-9" />
-    </inertial>
-  </link>
-  <joint
-    name="tail12_yaw_joint"
-    type="revolute">
-    <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
-    <parent
-      link="tail12_virtual_link" />
-    <child
-      link="tail12_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="-1.0472"
-      upper="1.0472"
-      effort="0"
-      velocity="10.472" />
-    <mimic
-      joint="tail1_yaw_joint"
-      multiplier="1.0"
-      offset="0" />
-  </joint>
   <link
     name="rl_hip_link">
     <inertial>
       <origin
-        xyz="-0.045138 0.013793 -0.000017"
+        xyz="-0.04360674 0.01300222 0"
         rpy="0 0 0" />
       <mass
-        value="0.374" />
+        value="0.40282962" />
       <inertia
-        ixx="0.000168286"
-        ixy="0.000007536"
-        ixz="0.000000345"
-        iyy="0.000185931"
-        iyz="0.000000002"
-        izz="0.000184126" />
+        ixx="0.00018066"
+        ixy="1.928e-05"
+        ixz="0"
+        iyy="0.00021966"
+        iyz="0"
+        izz="0.0002252" />
     </inertial>
     <visual>
       <origin
@@ -1391,14 +101,14 @@
           filename="package://marsdog/meshes/rl_hip_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.045 0.024 0"
+        xyz="-0.045 0.02 0"
         rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
@@ -1411,14 +121,14 @@
     name="rl_hip_joint"
     type="revolute">
     <origin
-      xyz="-0.041722 0.0335 -0.015186"
-      rpy="-0.0014526 -0.34907 0.00049681" />
+      xyz="-0.0530871685740839 0.0335004012032589 -0.0306494525501697"
+      rpy="0 -0.523598775548837 0" />
     <parent
       link="base_link" />
     <child
       link="rl_hip_link" />
     <axis
-      xyz="1 -0.00046685 0" />
+      xyz="1 0 0" />
     <limit
       lower="-0.49"
       upper="0.77"
@@ -1429,17 +139,17 @@
     name="rl_thigh_link">
     <inertial>
       <origin
-        xyz="0.008049 -0.015362 -0.059444"
+        xyz="0.00072389 -0.01711856 -0.05906162"
         rpy="0 0 0" />
       <mass
-        value="0.414" />
+        value="0.39029186" />
       <inertia
-        ixx="0.000341578"
-        ixy="-0.000003441"
-        ixz="0.000023433"
-        iyy="0.000290312"
-        iyz="-0.000011479"
-        izz="0.000218302" />
+        ixx="0.00033472"
+        ixy="-6.65e-06"
+        ixz="9.29e-06"
+        iyy="0.00029481"
+        iyz="-2.028e-05"
+        izz="0.00019633" />
     </inertial>
     <visual>
       <origin
@@ -1450,14 +160,14 @@
           filename="package://marsdog/meshes/rl_thigh_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.008 -0.015 -0.061"
+        xyz="0.001 -0.017 -0.059"
         rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
@@ -1470,14 +180,14 @@
     name="rl_thigh_joint"
     type="revolute">
     <origin
-      xyz="-0.046282 0.039422 5.0587E-05"
-      rpy="0 0.34907 0" />
+      xyz="-0.047 0.0394 0"
+      rpy="1.309E-05 0.5236 0" />
     <parent
       link="rl_hip_link" />
     <child
       link="rl_thigh_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-0.71"
       upper="1.77"
@@ -1488,17 +198,17 @@
     name="rl_calf_link">
     <inertial>
       <origin
-        xyz="-0.018059 -0.003444 -0.027577"
+        xyz="-0.0178134 -0.00245 -0.03584227"
         rpy="0 0 0" />
       <mass
-        value="0.048" />
+        value="0.02748893" />
       <inertia
-        ixx="0.000035198"
-        ixy="0.000000009"
-        ixz="-0.000003707"
-        iyy="0.000036916"
-        iyz="-0.000000131"
-        izz="0.000005612" />
+        ixx="1.955e-05"
+        ixy="0"
+        ixz="-9.82e-06"
+        iyy="2.385e-05"
+        iyz="0"
+        izz="6.75e-06" />
     </inertial>
     <visual>
       <origin
@@ -1509,15 +219,15 @@
           filename="package://marsdog/meshes/rl_calf_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.019375 0.0000531 -0.038886"
-        rpy="-3.01893026 0.00645097 1.5516491" />
+        xyz="-0.019 0 -0.035"
+        rpy="0 0.5 0" />
       <geometry>
         <box
           size="0.023 0.030 0.055" />
@@ -1528,17 +238,17 @@
     name="rl_calf_joint"
     type="revolute">
     <origin
-      xyz="0.023309 0.0090594 -0.11679"
+      xyz="0.00815055529011946 0.00790000000000006 -0.11883017880998"
       rpy="0 0 0" />
     <parent
       link="rl_thigh_link" />
     <child
       link="rl_calf_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
-      lower="-1.56"
-      upper="0"
+      lower="0"
+      upper="1.56"
       effort="14"
       velocity="32.9867" />
   </joint>
@@ -1546,17 +256,17 @@
     name="rl_tarsus_link">
     <inertial>
       <origin
-        xyz="0.001447 0.000898 -0.022124"
+        xyz="-0.00132315 0.00192812 -0.02213084"
         rpy="0 0 0" />
       <mass
-        value="0.032" />
+        value="0.03245619" />
       <inertia
-        ixx="0.000017088"
-        ixy="-0.000000745"
-        ixz="0.000003837"
-        iyy="0.000018218"
-        iyz="0.000002996"
-        izz="0.000002865" />
+        ixx="1.782e-05"
+        ixy="-3.7e-07"
+        ixz="1.96e-06"
+        iyy="1.821e-05"
+        iyz="3.09e-06"
+        izz="2.15e-06" />
     </inertial>
     <visual>
       <origin
@@ -1567,18 +277,18 @@
           filename="package://marsdog/meshes/rl_tarsus_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.003795 0.0052055 -0.030978"
-        rpy="2.89305646 -0.17906017 1.60041333" />
+        xyz="0 0.006 -0.029"
+        rpy="0 0.12 0" />
       <geometry>
         <box
-          size="0.014 0.0200 0.06" />
+          size="0.014 0.020 0.06" />
       </geometry>
     </collision>
   </link>
@@ -1586,14 +296,14 @@
     name="rl_tarsus_joint"
     type="revolute">
     <origin
-      xyz="-0.01875 0.00010616 -0.077772"
+      xyz="-0.038105 5E-05 -0.070342"
       rpy="0 0 0" />
     <parent
       link="rl_calf_link" />
     <child
       link="rl_tarsus_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-3.14159265358979"
       upper="3.14159265358979"
@@ -1608,17 +318,17 @@
     name="rl_foot_link">
     <inertial>
       <origin
-        xyz="-0.000299 0.000002 0.001204"
+        xyz="0 0 -0.00351823"
         rpy="0 0 0" />
       <mass
-        value="0.005" />
+        value="0.00282686" />
       <inertia
-        ixx="0.000000119"
-        ixy="0.000000000"
-        ixz="-0.000000014"
-        iyy="0.000000115"
-        iyz="0.000000000"
-        izz="0.000000172" />
+        ixx="7e-08"
+        ixy="0"
+        ixz="0"
+        iyy="7e-08"
+        iyz="0"
+        izz="1e-07" />
     </inertial>
     <visual>
       <origin
@@ -1629,9 +339,9 @@
           filename="package://marsdog/meshes/rl_foot_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -1648,35 +358,30 @@
     name="rl_foot_joint"
     type="fixed">
     <origin
-      xyz="0.01159 0.010411 -0.061956"
-      rpy="0 0 0" />
+      xyz="0.0029939 0.011326 -0.058227"
+      rpy="0 -0.11813 0" />
     <parent
       link="rl_tarsus_link" />
     <child
       link="rl_foot_link" />
     <axis
       xyz="0 0 0" />
-    <limit
-      lower="-3.14159265358979"
-      upper="3.14159265358979"
-      effort="100"
-      velocity="10" />
   </joint>
   <link
     name="rr_hip_link">
     <inertial>
       <origin
-        xyz="-0.045138 -0.013793 -0.000017"
+        xyz="-0.04360674 -0.01300222 0"
         rpy="0 0 0" />
       <mass
-        value="0.374" />
+        value="0.40282962" />
       <inertia
-        ixx="0.000168286"
-        ixy="-0.000007536"
-        ixz="0.000000345"
-        iyy="0.000185931"
-        iyz="-0.000000002"
-        izz="0.000184126" />
+        ixx="0.00018066"
+        ixy="-1.928e-05"
+        ixz="0"
+        iyy="0.00021966"
+        iyz="0"
+        izz="0.0002252" />
     </inertial>
     <visual>
       <origin
@@ -1687,14 +392,14 @@
           filename="package://marsdog/meshes/rr_hip_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.045 -0.024 0"
+        xyz="-0.045 -0.02 0"
         rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
@@ -1707,14 +412,14 @@
     name="rr_hip_joint"
     type="revolute">
     <origin
-      xyz="-0.041722 -0.0335 -0.015186"
-      rpy="-0.0014526 -0.34907 0.00049681" />
+      xyz="-0.053087 -0.0335 -0.03065"
+      rpy="0 -0.5236 0" />
     <parent
       link="base_link" />
     <child
       link="rr_hip_link" />
     <axis
-      xyz="1 -0.00046685 0" />
+      xyz="1 0 0" />
     <limit
       lower="-0.77"
       upper="0.49"
@@ -1725,17 +430,17 @@
     name="rr_thigh_link">
     <inertial>
       <origin
-        xyz="0.008049 0.015362 -0.059444"
+        xyz="0.00073574 0.01738841 -0.05957685"
         rpy="0 0 0" />
       <mass
-        value="0.414" />
+        value="0.38566891" />
       <inertia
-        ixx="0.000341578"
-        ixy="0.000003441"
-        ixz="0.000023433"
-        iyy="0.000290312"
-        iyz="0.000011479"
-        izz="0.000218302" />
+        ixx="0.00032072"
+        ixy="6.76e-06"
+        ixz="9.26e-06"
+        iyy="0.00028262"
+        iyz="1.58e-05"
+        izz="0.00019336" />
     </inertial>
     <visual>
       <origin
@@ -1746,14 +451,14 @@
           filename="package://marsdog/meshes/rr_thigh_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.008 0.015 -0.061"
+        xyz="0.001 0.017 -0.059"
         rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
@@ -1766,17 +471,17 @@
     name="rr_thigh_joint"
     type="revolute">
     <origin
-      xyz="-0.046318 -0.039378 -5.0537E-05"
-      rpy="0 0.34907 0" />
+      xyz="-0.0470000000000001 -0.0393999999974683 0"
+      rpy="1.30899691641225E-05 0.523598775561203 0" />
     <parent
       link="rr_hip_link" />
     <child
       link="rr_thigh_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
-      lower="-1.77"
-      upper="0.71"
+      lower="-0.71"
+      upper="1.77"
       effort="14"
       velocity="32.9867" />
   </joint>
@@ -1784,17 +489,17 @@
     name="rr_calf_link">
     <inertial>
       <origin
-        xyz="-0.018059 0.003444 -0.027577"
+        xyz="-0.0178134 0.00245 -0.03584227"
         rpy="0 0 0" />
       <mass
-        value="0.048" />
+        value="0.02748893" />
       <inertia
-        ixx="0.000035198"
-        ixy="-0.000000009"
-        ixz="-0.000003707"
-        iyy="0.000036916"
-        iyz="0.000000131"
-        izz="0.000005612" />
+        ixx="1.955e-05"
+        ixy="0"
+        ixz="-9.82e-06"
+        iyy="2.385e-05"
+        iyz="0"
+        izz="6.75e-06" />
     </inertial>
     <visual>
       <origin
@@ -1805,15 +510,15 @@
           filename="package://marsdog/meshes/rr_calf_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.019375 -0.0000531 -0.038886"
-        rpy="3.01893026 0.00645097 -1.5516491" />
+        xyz="-0.019 0 -0.035"
+        rpy="0 0.5 0" />
       <geometry>
         <box
           size="0.023 0.030 0.055" />
@@ -1824,14 +529,14 @@
     name="rr_calf_joint"
     type="revolute">
     <origin
-      xyz="0.022904 -0.0087404 -0.1169"
+      xyz="0.00815055529007039 -0.00789999999999996 -0.118830178809943"
       rpy="0 0 0" />
     <parent
       link="rr_thigh_link" />
     <child
       link="rr_calf_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="0"
       upper="1.56"
@@ -1842,17 +547,17 @@
     name="rr_tarsus_link">
     <inertial>
       <origin
-        xyz="0.001447 -0.000898 -0.022124"
+        xyz="-0.00132315 -0.00192812 -0.02213084"
         rpy="0 0 0" />
       <mass
-        value="0.032" />
+        value="0.03245619" />
       <inertia
-        ixx="0.000017088"
-        ixy="0.000000745"
-        ixz="0.000003837"
-        iyy="0.000018218"
-        iyz="-0.000002996"
-        izz="0.000002865" />
+        ixx="1.782e-05"
+        ixy="3.7e-07"
+        ixz="1.96e-06"
+        iyy="1.821e-05"
+        iyz="-3.09e-06"
+        izz="2.15e-06" />
     </inertial>
     <visual>
       <origin
@@ -1863,15 +568,15 @@
           filename="package://marsdog/meshes/rr_tarsus_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.003795 -0.0052055 -0.030978"
-        rpy="-2.89305646 -0.17906017 -1.60041333" />
+        xyz="0 -0.006 -0.029"
+        rpy="0 0.12 0" />
       <geometry>
         <box
           size="0.014 0.020 0.06" />
@@ -1882,14 +587,14 @@
     name="rr_tarsus_joint"
     type="revolute">
     <origin
-      xyz="-0.019514 0 -0.077584"
+      xyz="-0.0381047330872525 -4.99999999993422E-05 -0.0703422299642889"
       rpy="0 0 0" />
     <parent
       link="rr_calf_link" />
     <child
       link="rr_tarsus_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-3.14159265358979"
       upper="3.14159265358979"
@@ -1904,17 +609,17 @@
     name="rr_foot_link">
     <inertial>
       <origin
-        xyz="-0.000299 -0.000002 0.001204"
+        xyz="0 0 -0.00351823"
         rpy="0 0 0" />
       <mass
-        value="0.005" />
+        value="0.00282686" />
       <inertia
-        ixx="0.000000119"
-        ixy="0.000000000"
-        ixz="-0.000000014"
-        iyy="0.000000115"
-        iyz="0.000000000"
-        izz="0.000000172" />
+        ixx="7e-08"
+        ixy="0"
+        ixz="0"
+        iyy="7e-08"
+        iyz="0"
+        izz="1e-07" />
     </inertial>
     <visual>
       <origin
@@ -1925,9 +630,9 @@
           filename="package://marsdog/meshes/rr_foot_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -1944,8 +649,8 @@
     name="rr_foot_joint"
     type="fixed">
     <origin
-      xyz="0.011375 -0.010242 -0.062024"
-      rpy="0 0 0" />
+      xyz="0.00299391845062902 -0.0113262512375831 -0.0582274450635127"
+      rpy="0 -0.11812507471832 0" />
     <parent
       link="rr_tarsus_link" />
     <child
@@ -1957,17 +662,17 @@
     name="waist_roll_link">
     <inertial>
       <origin
-        xyz="0.039275 -0.004052 0.000334"
+        xyz="0.04070694 -0.00374882 0.00017385"
         rpy="0 0 0" />
       <mass
-        value="0.337" />
+        value="0.35780146" />
       <inertia
-        ixx="0.000180303"
-        ixy="0.000006126"
-        ixz="-0.000000251"
-        iyy="0.000178761"
-        iyz="0.000002575"
-        izz="0.000189349" />
+        ixx="0.00013817"
+        ixy="8.55e-06"
+        ixz="-2.5e-07"
+        iyy="0.00017797"
+        iyz="1.44e-06"
+        izz="0.00016983" />
     </inertial>
     <visual>
       <origin
@@ -1978,9 +683,9 @@
           filename="package://marsdog/meshes/waist_roll_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
@@ -1998,8 +703,8 @@
     name="waist_roll_joint"
     type="revolute">
     <origin
-      xyz="0.055059 0 0.028279"
-      rpy="-0.001365 0 0" />
+      xyz="0.0455 0 0"
+      rpy="0 0 0" />
     <parent
       link="base_link" />
     <child
@@ -2016,17 +721,17 @@
     name="waist_pitch_link">
     <inertial>
       <origin
-        xyz="0.056619 0.022538 -0.039921"
+        xyz="0.03949017 0.02394838 -0.03756478"
         rpy="0 0 0" />
       <mass
-        value="1.098" />
+        value="4.23177819" />
       <inertia
-        ixx="0.002254678"
-        ixy="-0.000032049"
-        ixz="-0.000089799"
-        iyy="0.002188164"
-        iyz="0.000042627"
-        izz="0.001367514" />
+        ixx="0.01143907"
+        ixy="-3.083e-05"
+        ixz="0.00087584"
+        iyy="0.01233052"
+        iyz="6.88e-05"
+        izz="0.01066144" />
     </inertial>
     <visual>
       <origin
@@ -2037,28 +742,14 @@
           filename="package://marsdog/meshes/waist_pitch_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
-      </material>
-    </visual>
-    <visual>
-      <origin
-        xyz="0.055 0.0235 -0.064"
-        rpy="0 0 0" />
-      <geometry>
-        <box
-          size="0.09 0.10 0.06" />
-      </geometry>
-      <material
-        name="battery">
-        <color
-          rgba="0.15 0.15 0.15 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.063 0 0"
+        xyz="0.05 0 0.01"
         rpy="0 0 0" />
       <geometry>
         <cylinder
@@ -2068,7 +759,7 @@
     </collision>
     <collision>
       <origin
-        xyz="0.055 0.0235 -0.064"
+        xyz="0.045 0.024 -0.07"
         rpy="0 0 0" />
       <geometry>
         <box
@@ -2080,14 +771,14 @@
     name="waist_pitch_joint"
     type="revolute">
     <origin
-      xyz="0.0415 -0.0235 0"
+      xyz="0.0450000000000001 -0.024 0"
       rpy="0 0 0" />
     <parent
       link="waist_roll_link" />
     <child
       link="waist_pitch_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="0"
       upper="0.24"
@@ -2098,36 +789,36 @@
     name="waist_yaw_link">
     <inertial>
       <origin
-        xyz="0.093599 0.001895 -0.063865"
+        xyz="0.0934864 0.00177277 -0.05980668"
         rpy="0 0 0" />
       <mass
-        value="1.264" />
+        value="1.28140701" />
       <inertia
-        ixx="0.002513037"
-        ixy="0.000068812"
-        ixz="0.000977446"
-        iyy="0.002998499"
-        iyz="-0.000092237"
-        izz="0.002016199" />
+        ixx="0.00239015"
+        ixy="7.154e-05"
+        ixz="0.00100313"
+        iyy="0.00290637"
+        iyz="-9.495e-05"
+        izz="0.00191513" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/waist_yaw_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.063111 0.002447 -0.023828"
-        rpy="1.570796 0 0" />
+        xyz="0.063 0 -0.02"
+        rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
           length="0.068"
@@ -2136,8 +827,8 @@
     </collision>
     <collision>
       <origin
-        xyz="0.111 0.000027 -0.085968"
-        rpy="1.570796 0 0" />
+        xyz="0.111 0 -0.082"
+        rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
           length="0.088"
@@ -2149,14 +840,14 @@
     name="waist_yaw_joint"
     type="revolute">
     <origin
-      xyz="0.0635 0.023463 0.026782"
+      xyz="0.0634999999999956 0.0239999999999988 0.0227500000000019"
       rpy="0 0 0" />
     <parent
       link="waist_pitch_link" />
     <child
       link="waist_yaw_link" />
     <axis
-      xyz="0 -0.001365 1" />
+      xyz="0 0 1" />
     <limit
       lower="-1.2"
       upper="1.2"
@@ -2167,36 +858,36 @@
     name="neck_pitch_link">
     <inertial>
       <origin
-        xyz="0.045423 -0.027662 0.0289"
+        xyz="0.04340968 -0.02351023 0.03039197"
         rpy="0 0 0" />
       <mass
-        value="0.295" />
+        value="0.24748464" />
       <inertia
-        ixx="0.000146524"
-        ixy="0.000028014"
-        ixz="-0.000031716"
-        iyy="0.000165504"
-        iyz="0.000017796"
-        izz="0.000176361" />
+        ixx="0.00011721"
+        ixy="2.874e-05"
+        ixz="-3.093e-05"
+        iyy="0.00013092"
+        iyz="2.011e-05"
+        izz="0.00013973" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/neck_pitch_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.047501 -0.02831 0.028921"
-        rpy="-3.141593 -1.005106 -3.141593" />
+        xyz="0.043 -0.024 0.03"
+        rpy="0 -1.0 0" />
       <geometry>
         <cylinder
           length="0.05"
@@ -2208,7 +899,7 @@
     name="neck_pitch_joint"
     type="revolute">
     <origin
-      xyz="0.063536 0.031281 -0.022505"
+      xyz="0.0634999999999999 0.0282499999999988 -0.0185"
       rpy="0 0 0" />
     <parent
       link="waist_yaw_link" />
@@ -2226,35 +917,35 @@
     name="head_roll_link">
     <inertial>
       <origin
-        xyz="0.01026 -0.003837 -0.000734"
+        xyz="0.0298812 0.00462939 0.04106704"
         rpy="0 0 0" />
       <mass
-        value="0.274" />
+        value="0.22511155" />
       <inertia
-        ixx="0.000110718"
-        ixy="-0.000000100"
-        ixz="-0.000000325"
-        iyy="0.000114116"
-        iyz="0.000000559"
-        izz="0.000100935" />
+        ixx="7.594e-05"
+        ixy="3e-08"
+        ixz="5e-08"
+        iyy="7.105e-05"
+        iyz="2e-07"
+        izz="7.144e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="-0.014338 0 0.004199"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/head_roll_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.011662 -0.004 -0.005801"
+        xyz="0.03 0 0.013"
         rpy="0 0 0" />
       <geometry>
         <cylinder
@@ -2267,14 +958,14 @@
     name="head_roll_joint"
     type="revolute">
     <origin
-      xyz="0.067501 -0.02831 0.042889"
-      rpy="0 -0.56569 0" />
+      xyz="0.062255555366079 -0.0291999999994765 0.0435918091625143"
+      rpy="0 -0.610865238198017 0" />
     <parent
       link="neck_pitch_link" />
     <child
       link="head_roll_link" />
     <axis
-      xyz="-1 0.00073162 0" />
+      xyz="1 0 0" />
     <limit
       lower="-3.14159265358979"
       upper="3.14159265358979"
@@ -2285,36 +976,36 @@
     name="head_yaw_link">
     <inertial>
       <origin
-        xyz="-0.013963 0.004899 0.029247"
+        xyz="-0.00193296 0.0001188 -0.01762939"
         rpy="0 0 0" />
       <mass
-        value="0.274" />
+        value="0.22511155" />
       <inertia
-        ixx="0.000114052"
-        ixy="0.000000468"
-        ixz="0.000000028"
-        iyy="0.000100887"
-        iyz="0.000000570"
-        izz="0.000110740" />
+        ixx="7.144e-05"
+        ixy="-5e-08"
+        ixz="-2e-07"
+        iyy="7.594e-05"
+        iyz="3e-08"
+        izz="7.105e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="-0.014338 0 0.004199"
-        rpy="0 -1.5696 -1.5715" />
+        xyz="0 0 0"
+        rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/head_yaw_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.014338 0.006 0.029199"
-        rpy="1.570796 0 0" />
+        xyz="0 0 0.01"
+        rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
           length="0.06"
@@ -2326,7 +1017,7 @@
     name="head_yaw_joint"
     type="revolute">
     <origin
-      xyz="0.015514 0.0010134 0.014495"
+      xyz="0.0299999999999988 0 0.013"
       rpy="0 0 0" />
     <parent
       link="head_roll_link" />
@@ -2344,36 +1035,36 @@
     name="head_pitch_link">
     <inertial>
       <origin
-        xyz="0.007085 0.00162 0.010054"
+        xyz="0.06435141 0.00328185 0.04624769"
         rpy="0 0 0" />
       <mass
-        value="0.025" />
+        value="0.78588222" />
       <inertia
-        ixx="0.000006091"
-        ixy="-0.000000973"
-        ixz="-0.000002297"
-        iyy="0.000008226"
-        iyz="-0.000001274"
-        izz="0.000004837" />
+        ixx="0.00114577"
+        ixy="-3.497e-05"
+        ixz="3.856e-05"
+        iyy="0.00196127"
+        iyz="-1.81e-05"
+        izz="0.00205638" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/head_pitch_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.05 0.01 0.050032"
-        rpy="3.141593 1.12173 3.141593" />
+        xyz="0.064 0 0.046"
+        rpy="0 1.12 0" />
       <geometry>
         <cylinder
           length="0.12"
@@ -2385,8 +1076,8 @@
     name="head_pitch_joint"
     type="revolute">
     <origin
-      xyz="-0.0145282626 -0.0215314491 0.0289972420"
-      rpy="0 0.56570 0" />
+      xyz="0 -0.012999999999996 0.0299999999999988"
+      rpy="0 0.610865238198016 0" />
     <parent
       link="head_yaw_link" />
     <child
@@ -2403,36 +1094,36 @@
     name="fl_hip_pitch_link">
     <inertial>
       <origin
-        xyz="-0.036249 0.026796 -0.000863"
+        xyz="-0.03673375 0.02373127 0"
         rpy="0 0 0" />
       <mass
-        value="0.266" />
+        value="0.19550425" />
       <inertia
-        ixx="0.000094796"
-        ixy="0.000009648"
-        ixz="-0.000000375"
-        iyy="0.000119621"
-        iyz="0.000000295"
-        izz="0.000125834" />
+        ixx="5.209e-05"
+        ixy="1.186e-05"
+        ixz="0"
+        iyy="7.47e-05"
+        iyz="0"
+        izz="8.081e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fl_hip_pitch_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.036 0.027114 0.000032"
-        rpy="0 1.570796 0" />
+        xyz="-0.037 0.024 0"
+        rpy="0 1.57079632679 0" />
       <geometry>
         <cylinder
           length="0.063"
@@ -2444,14 +1135,14 @@
     name="fl_hip_pitch_joint"
     type="revolute">
     <origin
-      xyz="0.11134 0.040867 -0.085936"
+      xyz="0.111344294340592 0.0412499999999985 -0.0819915230487584"
       rpy="0 0 0" />
     <parent
       link="waist_yaw_link" />
     <child
       link="fl_hip_pitch_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-3.14159265358979"
       upper="0.97"
@@ -2462,39 +1153,39 @@
     name="fl_thigh_roll_link">
     <inertial>
       <origin
-        xyz="0.019147 0.004458 -0.03082"
+        xyz="0.01597399 0.01174741 -0.03872744"
         rpy="0 0 0" />
       <mass
-        value="0.087" />
+        value="0.08017506" />
       <inertia
-        ixx="0.000074448"
-        ixy="-0.000002300"
-        ixz="0.000014306"
-        iyy="0.000076387"
-        iyz="0.000011338"
-        izz="0.000013919" />
+        ixx="0.00011818"
+        ixy="-3.45e-06"
+        ixz="1.228e-05"
+        iyy="0.00012039"
+        iyz="1.009e-05"
+        izz="1.252e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fl_thigh_roll_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.0218 0.002037 -0.016968"
+        xyz="0.016 0.008 -0.035"
         rpy="0 0 0" />
       <geometry>
         <box
-          size="0.005 0.035 0.06" />
+          size="0.01 0.035 0.07" />
       </geometry>
     </collision>
   </link>
@@ -2502,14 +1193,14 @@
     name="fl_thigh_roll_joint"
     type="revolute">
     <origin
-      xyz="-0.0205 0.028 3.8219E-05"
+      xyz="-0.0204999999999978 0.0255000000000006 0"
       rpy="0 0 0" />
     <parent
       link="fl_hip_pitch_link" />
     <child
       link="fl_thigh_roll_link" />
     <axis
-      xyz="0.99966 3.5842E-05 0.026258" />
+      xyz="1 0 0" />
     <limit
       lower="-0.18"
       upper="3.14159265358979"
@@ -2520,49 +1211,49 @@
     name="fl_calf_link">
     <inertial>
       <origin
-        xyz="0.001263 -0.012283 -0.03026"
+        xyz="5.097e-05 -0.01698315 -0.03590979"
         rpy="0 0 0" />
       <mass
-        value="0.462" />
+        value="0.41615103" />
       <inertia
-        ixx="0.000780649"
-        ixy="-0.000002898"
-        ixz="0.000027933"
-        iyy="0.000757818"
-        iyz="0.000060391"
-        izz="0.000138689" />
+        ixx="0.00059236"
+        ixy="-4e-08"
+        ixz="1.66e-06"
+        iyy="0.00058218"
+        iyz="2.36e-05"
+        izz="8.194e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fl_calf_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.00202 -0.00848 -0.060938"
+        xyz="0 -0.013 -0.055"
         rpy="0 0 0" />
       <geometry>
         <cylinder
-          length="0.072"
+          length="0.09"
           radius="0.016" />
       </geometry>
     </collision>
     <collision>
       <origin
-        xyz="0.00202 -0.01408 0.000032"
-        rpy="1.570796 0 0" />
+        xyz="0 -0.014 0"
+        rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
-          length="0.057"
+          length="0.05"
           radius="0.023" />
       </geometry>
     </collision>
@@ -2571,14 +1262,14 @@
     name="fl_calf_joint"
     type="revolute">
     <origin
-      xyz="0.0235 0.0034955 -0.069995"
+      xyz="0.0204999999999997 0.00849999999999988 -0.0899999999999999"
       rpy="0 0 0" />
     <parent
       link="fl_thigh_roll_link" />
     <child
       link="fl_calf_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-1.82"
       upper="1.93"
@@ -2589,39 +1280,39 @@
     name="fl_tarsus_link">
     <inertial>
       <origin
-        xyz="0 -0.005009 -0.026597"
+        xyz="0.00051211 -0.00136997 -0.02922072"
         rpy="0 0 0" />
       <mass
-        value="0.067" />
+        value="0.09354472" />
       <inertia
-        ixx="0.000017528"
-        ixy="0.000000000"
-        ixz="-0.000000001"
-        iyy="0.000015233"
-        iyz="-0.000000662"
-        izz="0.000008400" />
+        ixx="4.444e-05"
+        ixy="-6e-08"
+        ixz="-1.8e-07"
+        iyy="4.068e-05"
+        iyz="-1.72e-06"
+        izz="1.167e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fl_tarsus_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0 -0.003688 -0.020942"
+        xyz="0 -0.002 -0.03"
         rpy="0 0 0" />
       <geometry>
         <cylinder
-          length="0.052"
+          length="0.055"
           radius="0.018" />
       </geometry>
     </collision>
@@ -2630,17 +1321,17 @@
     name="fl_tarsus_joint"
     type="revolute">
     <origin
-      xyz="0.0040403 -0.0022336 -0.12194"
+      xyz="0 -0.0129931382700103 -0.11088651657851"
       rpy="0 0 0" />
     <parent
       link="fl_calf_link" />
     <child
       link="fl_tarsus_link" />
     <axis
-      xyz="0 1 0.001365" />
+      xyz="0 1 0" />
     <limit
-      lower="-1.49"
-      upper="0.03"
+      lower="-0.03"
+      upper="1.49"
       effort="0.4119"
       velocity="9.9484" />
   </joint>
@@ -2648,35 +1339,35 @@
     name="fl_foot_link">
     <inertial>
       <origin
-        xyz="0 0.000039 0.001272"
+        xyz="0 0 -0.00351823"
         rpy="0 0 0" />
       <mass
-        value="0.005" />
+        value="0.00282686" />
       <inertia
-        ixx="0.000000119"
-        ixy="0.000000000"
-        ixz="-0.000000014"
-        iyy="0.000000115"
-        iyz="0.000000000"
-        izz="0.000000172" />
+        ixx="7e-08"
+        ixy="0"
+        ixz="0"
+        iyy="7e-08"
+        iyz="0"
+        izz="1e-07" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fl_foot_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -2688,7 +1379,7 @@
     name="fl_foot_joint"
     type="fixed">
     <origin
-      xyz="0 -0.005449 -0.051948"
+      xyz="0 -0.002019916666668 -0.0591902329339155"
       rpy="0 0 0" />
     <parent
       link="fl_tarsus_link" />
@@ -2701,36 +1392,36 @@
     name="fr_hip_pitch_link">
     <inertial>
       <origin
-        xyz="-0.036249 -0.026722 -0.000863"
+        xyz="-0.03673375 -0.02373127 0"
         rpy="0 0 0" />
       <mass
-        value="0.266" />
+        value="0.19550425" />
       <inertia
-        ixx="0.000094796"
-        ixy="-0.000009648"
-        ixz="-0.000000375"
-        iyy="0.000119621"
-        iyz="-0.000000295"
-        izz="0.000125834" />
+        ixx="5.209e-05"
+        ixy="-1.186e-05"
+        ixz="0"
+        iyy="7.47e-05"
+        iyz="0"
+        izz="8.081e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fr_hip_pitch_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="-0.036 -0.02704 0.000032"
-        rpy="0 1.570796 0" />
+        xyz="-0.037 -0.024 0"
+        rpy="0 1.57079632679 0" />
       <geometry>
         <cylinder
           length="0.063"
@@ -2742,17 +1433,17 @@
     name="fr_hip_pitch_joint"
     type="revolute">
     <origin
-      xyz="0.11134 -0.040633 -0.086047"
+      xyz="0.111344294340584 -0.0412500000000016 -0.0819915230487582"
       rpy="0 0 0" />
     <parent
       link="waist_yaw_link" />
     <child
       link="fr_hip_pitch_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
-      lower="-0.97"
-      upper="3.14159265358979"
+      lower="-3.14159265358979"
+      upper="0.97"
       effort="17"
       velocity="32.9867" />
   </joint>
@@ -2760,39 +1451,39 @@
     name="fr_thigh_roll_link">
     <inertial>
       <origin
-        xyz="0.019147 -0.004384 -0.03082"
+        xyz="0.01597399 -0.01174741 -0.03872744"
         rpy="0 0 0" />
       <mass
-        value="0.087" />
+        value="0.08017506" />
       <inertia
-        ixx="0.000074448"
-        ixy="0.000002300"
-        ixz="0.000014306"
-        iyy="0.000076387"
-        iyz="-0.000011338"
-        izz="0.000013919" />
+        ixx="0.00011818"
+        ixy="3.45e-06"
+        ixz="1.228e-05"
+        iyy="0.00012039"
+        iyz="-1.009e-05"
+        izz="1.252e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fr_thigh_roll_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.0218 -0.001963 -0.016968"
+        xyz="0.016 -0.008 -0.035"
         rpy="0 0 0" />
       <geometry>
         <box
-          size="0.005 0.035 0.06" />
+          size="0.01 0.035 0.07" />
       </geometry>
     </collision>
   </link>
@@ -2800,14 +1491,14 @@
     name="fr_thigh_roll_joint"
     type="revolute">
     <origin
-      xyz="-0.020493 -0.027999 -0.00057652"
+      xyz="-0.020499999999996 -0.0254999999999991 0"
       rpy="0 0 0" />
     <parent
       link="fr_hip_pitch_link" />
     <child
       link="fr_thigh_roll_link" />
     <axis
-      xyz="0.99966 -3.5842E-05 0.026258" />
+      xyz="1 0 0" />
     <limit
       lower="-3.14159265358979"
       upper="0.18"
@@ -2818,49 +1509,49 @@
     name="fr_calf_link">
     <inertial>
       <origin
-        xyz="0.001263 0.012357 -0.03026"
+        xyz="4.915e-05 0.01698364 -0.03590979"
         rpy="0 0 0" />
       <mass
-        value="0.462" />
+        value="0.41615103" />
       <inertia
-        ixx="0.000780649"
-        ixy="0.000002898"
-        ixz="0.000027933"
-        iyy="0.000757818"
-        iyz="-0.000060391"
-        izz="0.000138689" />
+        ixx="0.00059236"
+        ixy="2e-08"
+        ixz="1.59e-06"
+        iyy="0.00058218"
+        iyz="-2.359e-05"
+        izz="8.194e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fr_calf_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0.00202 0.008554 -0.060938"
+        xyz="0 0.013 -0.055"
         rpy="0 0 0" />
       <geometry>
         <cylinder
-          length="0.072"
+          length="0.09"
           radius="0.016" />
       </geometry>
     </collision>
     <collision>
       <origin
-        xyz="0.00202 0.014154 0.000032"
-        rpy="1.570796 0 0" />
+        xyz="0 0.014 0"
+        rpy="1.57079632679 0 0" />
       <geometry>
         <cylinder
-          length="0.057"
+          length="0.05"
           radius="0.023" />
       </geometry>
     </collision>
@@ -2869,17 +1560,17 @@
     name="fr_calf_joint"
     type="revolute">
     <origin
-      xyz="0.02533 -0.0033053 -0.069363"
+      xyz="0.0204999999999999 -0.00849999999999999 -0.0900000000000001"
       rpy="0 0 0" />
     <parent
       link="fr_thigh_roll_link" />
     <child
       link="fr_calf_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
-      lower="-1.93"
-      upper="1.82"
+      lower="-1.82"
+      upper="1.93"
       effort="6"
       velocity="10.472" />
   </joint>
@@ -2887,39 +1578,39 @@
     name="fr_tarsus_link">
     <inertial>
       <origin
-        xyz="0 0.005083 -0.026597"
+        xyz="-4.504e-05 0.00132324 -0.03020079"
         rpy="0 0 0" />
       <mass
-        value="0.067" />
+        value="0.0905228" />
       <inertia
-        ixx="0.000017528"
-        ixy="0.000000000"
-        ixz="-0.000000001"
-        iyy="0.000015233"
-        iyz="0.000000662"
-        izz="0.000008400" />
+        ixx="4.146e-05"
+        ixy="9e-08"
+        ixz="-8e-07"
+        iyy="3.798e-05"
+        iyz="1.84e-06"
+        izz="1.14e-05" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fr_tarsus_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0 0.003832 -0.020935"
+        xyz="0 0.002 -0.03"
         rpy="0 0 0" />
       <geometry>
         <cylinder
-          length="0.052"
+          length="0.055"
           radius="0.018" />
       </geometry>
     </collision>
@@ -2928,14 +1619,14 @@
     name="fr_tarsus_joint"
     type="revolute">
     <origin
-      xyz="0.0055464 0.0025664 -0.12187"
+      xyz="0 0.0129931382700104 -0.11088651657851"
       rpy="0 0 0" />
     <parent
       link="fr_calf_link" />
     <child
       link="fr_tarsus_link" />
     <axis
-      xyz="0 -1 -0.001365" />
+      xyz="0 1 0" />
     <limit
       lower="-0.03"
       upper="1.49"
@@ -2946,35 +1637,35 @@
     name="fr_foot_link">
     <inertial>
       <origin
-        xyz="0 0.000035 0.001272"
+        xyz="0 0 -0.00351823"
         rpy="0 0 0" />
       <mass
-        value="0.005" />
+        value="0.00282686" />
       <inertia
-        ixx="0.000000119"
-        ixy="0.000000000"
-        ixz="-0.000000014"
-        iyy="0.000000115"
-        iyz="0.000000000"
-        izz="0.000000172" />
+        ixx="7e-08"
+        ixy="0"
+        ixz="0"
+        iyy="7e-08"
+        iyz="0"
+        izz="1e-07" />
     </inertial>
     <visual>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
           filename="package://marsdog/meshes/fr_foot_link.STL" />
       </geometry>
       <material
-        name="default_material">
+        name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="0.843137254901961 0.815686274509804 0.752941176470588 1" />
       </material>
     </visual>
     <collision>
       <origin
-        xyz="0 0.000037 0.000032"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
         <mesh
@@ -2986,13 +1677,131 @@
     name="fr_foot_joint"
     type="fixed">
     <origin
-      xyz="0 0.0055908 -0.051933"
-      rpy="0 0 0" />
+      xyz="-0.00112547900491583 0.00201991666666686 -0.0591795316961916"
+      rpy="0 0.0190157527794673 0" />
     <parent
       link="fr_tarsus_link" />
     <child
       link="fr_foot_link" />
     <axis
       xyz="0 0 0" />
+  </joint>
+  <link
+    name="tail_yaw_link">
+    <inertial>
+      <origin
+        xyz="-0.00733544 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.00601534" />
+      <inertia
+        ixx="3.1e-07"
+        ixy="0"
+        ixz="0"
+        iyy="2.6e-07"
+        iyz="0"
+        izz="2.6e-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://marsdog/meshes/tail_yaw_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.008 0 0"
+        rpy="0 1.57079632679 0" />
+      <geometry>
+        <cylinder
+          length="0.02"
+          radius="0.01" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="tail_yaw_joint"
+    type="revolute">
+    <origin
+      xyz="-0.16074 0 0.014415"
+      rpy="0 -0.24435 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="tail_yaw_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.3"
+      upper="0.3"
+      effort="6"
+      velocity="10.472" />
+  </joint>
+  <link
+    name="tail_pitch_link">
+    <inertial>
+      <origin
+        xyz="-0.02353544 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.00601534" />
+      <inertia
+        ixx="3.1e-07"
+        ixy="0"
+        ixz="0"
+        iyy="2.6e-07"
+        iyz="0"
+        izz="2.6e-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://marsdog/meshes/tail_pitch_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.024 0 0"
+        rpy="0 1.57079632679 0" />
+      <geometry>
+        <cylinder
+          length="0.04"
+          radius="0.009" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="tail_pitch_joint"
+    type="revolute">
+    <origin
+      xyz="-0.016782 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="tail_yaw_link" />
+    <child
+      link="tail_pitch_link" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.3"
+      upper="0.3"
+      effort="6"
+      velocity="10.472" />
   </joint>
 </robot>

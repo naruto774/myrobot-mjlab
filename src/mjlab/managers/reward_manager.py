@@ -26,6 +26,10 @@ class RewardTermCfg(ManagerTermBaseCfg):
   weight: float
   """Weight multiplier for this reward term."""
 
+  group: int = 0
+  """Reward group index for multi-critic training. Default 0 keeps a single
+  scalar ``compute()`` output so velocity/tracking tasks are unchanged."""
+
 
 class RewardManager(ManagerBase):
   """Manages reward computation by aggregating weighted reward terms.
@@ -73,6 +77,14 @@ class RewardManager(ManagerBase):
     self._step_reward = torch.zeros(
       (self.num_envs, len(self._term_names)), dtype=torch.float, device=self.device
     )
+    self._num_groups = max((cfg.group for cfg in self._term_cfgs), default=0) + 1
+    self._group_buf: torch.Tensor | None
+    if self._num_groups > 1:
+      self._group_buf = torch.zeros(
+        self.num_envs, self._num_groups, dtype=torch.float, device=self.device
+      )
+    else:
+      self._group_buf = None
 
   def __str__(self) -> str:
     msg = f"<RewardManager> contains {len(self._term_names)} active terms.\n"
@@ -95,6 +107,15 @@ class RewardManager(ManagerBase):
   def active_terms(self) -> list[str]:
     return self._term_names
 
+  @property
+  def num_groups(self) -> int:
+    return self._num_groups
+
+  @property
+  def group_buf(self) -> torch.Tensor | None:
+    """Per-group rewards of shape ``[N, G]``, or ``None`` when G == 1."""
+    return self._group_buf
+
   # Methods.
 
   def reset(
@@ -115,6 +136,8 @@ class RewardManager(ManagerBase):
 
   def compute(self, dt: float) -> torch.Tensor:
     self._reward_buf[:] = 0.0
+    if self._group_buf is not None:
+      self._group_buf[:] = 0.0
     scale = dt if self._scale_by_dt else 1.0
     for term_idx, (name, term_cfg) in enumerate(
       zip(self._term_names, self._term_cfgs, strict=False)
@@ -128,6 +151,8 @@ class RewardManager(ManagerBase):
       # NaN/Inf can occur from corrupted physics state; zero them to avoid policy crash.
       value = torch.nan_to_num(value, nan=0.0, posinf=0.0, neginf=0.0)
       self._reward_buf += value
+      if self._group_buf is not None:
+        self._group_buf[:, term_cfg.group] += value
       self._episode_sums[name] += value
       self._step_reward[:, term_idx] = value / scale
     return self._reward_buf

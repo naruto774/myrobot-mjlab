@@ -80,8 +80,8 @@ RS01_ACTUATOR = ElectricActuator(
 )
 EL05_ACTUATOR = ElectricActuator(
   reflected_inertia=EL05_INERTIA,
-  velocity_limit=10.472,
-  effort_limit=6,
+  velocity_limit=28,
+  effort_limit=12,
 )
 PA43_ACTUATOR = ElectricActuator(
   reflected_inertia=PA43_INERTIA,
@@ -91,7 +91,7 @@ PA43_ACTUATOR = ElectricActuator(
 DM2325_ACTUATOR = ElectricActuator(
   reflected_inertia=5e-4,
   velocity_limit=39.8,
-  effort_limit=5,
+  effort_limit=8,
 )
 NATURAL_FREQ = 10 * 2.0 * 3.1415926535  # 10Hz
 DAMPING_RATIO = 2.0

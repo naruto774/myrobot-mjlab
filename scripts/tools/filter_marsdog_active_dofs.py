@@ -1,6 +1,8 @@
 """Filter Marsdog retargeted CSVs down to the current 21 command joints.
 
 Supported input layouts:
+  - 32 columns from hudong.csv:
+    root pose, two unsupported tail joints, then 23 Marsdog hinge qpos.
   - 30 columns from dison.bvh:
     [0:7] root pose = x, y, z, qx, qy, qz, qw
     [7:30] MuJoCo hinge qpos, including passive rear tarsus joints.
@@ -23,8 +25,48 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+HUDONG_COLUMN_COUNT = 32
 DISON_COLUMN_COUNT = 30
 ACTIVE_COLUMN_COUNT = 28
+
+# hudong.csv layout:
+#   root: 0-6
+#   unsupported tail joints: 7-8
+#   qpos: rl hip/thigh/calf/tarsus, rr hip/thigh/calf/tarsus, waist, head,
+#         fl hip/thigh/calf/tarsus, fr hip/thigh/calf/tarsus
+#
+# The tail joints and passive rear tarsus joints are omitted. Front tarsus
+# joints are retained and moved to the end to match MARSDOG_JOINT_NAMES.
+HUDONG_TO_ACTIVE_COLUMN_INDICES: tuple[int, ...] = (
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  9,
+  10,
+  11,
+  13,
+  14,
+  15,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  28,
+  29,
+  30,
+  27,
+  31,
+)
 
 # dison.bvh CSV layout:
 #   root: 0-6
@@ -96,6 +138,7 @@ ACTIVE_COLUMN_NAMES: tuple[str, ...] = (
   "fr_tarsus_joint",
 )
 
+assert len(HUDONG_TO_ACTIVE_COLUMN_INDICES) == ACTIVE_COLUMN_COUNT
 assert len(DISON_TO_ACTIVE_COLUMN_INDICES) == ACTIVE_COLUMN_COUNT
 assert len(ACTIVE_COLUMN_NAMES) == ACTIVE_COLUMN_COUNT
 
@@ -122,12 +165,15 @@ def filter_active_dofs(input_path: Path, output_path: Path) -> int:
         # Already filtered. Preserve the row so rerunning the tool is harmless.
         # The expected order is printed by --print-columns.
         selected = fields
+      elif len(fields) == HUDONG_COLUMN_COUNT:
+        selected = [fields[idx] for idx in HUDONG_TO_ACTIVE_COLUMN_INDICES]
       elif len(fields) == DISON_COLUMN_COUNT:
         selected = [fields[idx] for idx in DISON_TO_ACTIVE_COLUMN_INDICES]
       else:
         raise ValueError(
           f"Line {line_no} has {len(fields)} columns, expected "
-          f"{DISON_COLUMN_COUNT} dison columns or "
+          f"{HUDONG_COLUMN_COUNT} hudong columns, "
+          f"{DISON_COLUMN_COUNT} dison columns, or "
           f"{ACTIVE_COLUMN_COUNT} active columns."
         )
 
@@ -145,7 +191,10 @@ def main() -> None:
     "--input-file",
     type=Path,
     default=Path("src/mjlab/csv/dison.csv"),
-    help="Input Marsdog CSV with 30 dison columns or 28 filtered columns.",
+    help=(
+      "Input Marsdog CSV with 32 hudong columns, 30 dison columns, "
+      "or 28 filtered columns."
+    ),
   )
   parser.add_argument(
     "--output-file",

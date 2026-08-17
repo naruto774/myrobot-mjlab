@@ -8,6 +8,11 @@ Upcoming version (not yet released)
 Added
 ^^^^^
 
+- Added Marsdog style-imitation task ``Mjlab-Style-Flat-Marsdog``:
+  tiled cyclic expert clip, Go2-style ``(v_x, 0, ω_z)`` commands, dual-head
+  critic, and DecAP on the existing BuiltinPosition PD. Actor observations
+  stay 72-d with no gait phase so the trained policy is deployable.
+
 - Added Marsdog-without-tarsus velocity tasks
   (``Mjlab-Velocity-Flat-Marsdog-Without-Tarsus``,
   ``Mjlab-Velocity-Rough-Marsdog-Without-Tarsus``). Front tarsus joints are
@@ -15,6 +20,24 @@ Added
 
 - Added Unitree Go2 flat motion-tracking tasks, including a no-state-estimation
   actor configuration and conservative Sim-to-Real domain randomization.
+
+Changed
+^^^^^^^
+
+- Marsdog style DecAP follows APEX's default exponential
+  (``λ = 0.99^{s/500}`` from step 0): full prior immediately, then a
+  gradual handoff. Cosine hold-then-wean remains available as an
+  ablation.
+
+Fixed
+^^^^^
+
+- Style imitation kernels now match APEX (``exp(-mean((x-x*)²) / σ)``).
+  The previous ``sum / σ²`` form zeroed the 14-DoF leg term while the
+  policy was still far from the clip.
+- ``play --motion-file`` now injects the tiled clip into style tasks
+  (``commands.style``). Previously it only wired Tracking's
+  ``commands.motion``, so ``Mjlab-Style-Flat-Marsdog`` ignored the flag.
 
 Version 1.4.0 (May 26, 2026)
 ----------------------------

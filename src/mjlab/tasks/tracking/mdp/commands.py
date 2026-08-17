@@ -10,19 +10,20 @@ import numpy as np
 import torch
 
 from mjlab.managers import CommandTerm, CommandTermCfg
+# 数学工具
 from mjlab.utils.lab_api.math import (
-  matrix_from_quat,
-  quat_apply,
-  quat_error_magnitude,
-  quat_from_euler_xyz,
-  quat_inv,
-  quat_mul,
-  sample_uniform,
-  yaw_quat,
+  matrix_from_quat, # 从四元数计算旋转矩阵
+  quat_apply, # 应用四元数旋转
+  quat_error_magnitude, # 计算四元数误差
+  quat_from_euler_xyz, # 从欧拉角转换为四元数
+  quat_inv, # 计算四元数逆
+  quat_mul, # 四元数乘法
+  sample_uniform, # 均匀采样
+  yaw_quat, # 计算四元数的yaw角
 )
 from mjlab.viewer.debug_visualizer import DebugVisualizer
-
-if TYPE_CHECKING:
+# 类型检查
+if TYPE_CHECKING: # 如果类型检查被启用
   from collections.abc import Callable
   from typing import Any
 
@@ -70,21 +71,30 @@ class MotionLoader:
       self._body_ang_vel_w = torch.tensor(
         data["body_ang_vel_w"][:, body_order], dtype=torch.float32, device=device
       )
+      self.time_step_total = self.joint_pos.shape[0]
+      if "cycle_len" in data:
+        self.cycle_len = int(np.asarray(data["cycle_len"]).reshape(-1)[0])
+      else:
+        self.cycle_len = self.time_step_total
+      if "cmd_vx" in data:
+        self.cmd_vx = float(np.asarray(data["cmd_vx"]).reshape(-1)[0])
+      else:
+        self.cmd_vx = 0.0
     self._body_indexes = body_indexes
     self.body_pos_w = self._body_pos_w[:, self._body_indexes]
     self.body_quat_w = self._body_quat_w[:, self._body_indexes]
     self.body_lin_vel_w = self._body_lin_vel_w[:, self._body_indexes]
     self.body_ang_vel_w = self._body_ang_vel_w[:, self._body_indexes]
-    self.time_step_total = self.joint_pos.shape[0]
 
   @staticmethod
+  # 解析档案顺序
   def _resolve_archive_order(
     data: np.lib.npyio.NpzFile,
     names_key: str,
     expected_names: Sequence[str],
     data_width: int,
   ) -> list[int]:
-    """Map optional archive name metadata into the current Entity order."""
+    """将可选的档案名称元数据映射到当前实体的顺序。"""
     expected = tuple(expected_names)
     if names_key not in data:
       if data_width != len(expected):

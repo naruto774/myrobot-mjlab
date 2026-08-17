@@ -82,6 +82,18 @@ class RslRlPpoAlgorithmCfg:
 
 
 @dataclass
+class RslRlMultiCriticPpoAlgorithmCfg(RslRlPpoAlgorithmCfg):
+  """PPO config for the two-headed style critic."""
+
+  class_name: str = "mjlab.rl.multi_critic:MultiCriticPPO"
+  """Resolved by RSL-RL to :class:`mjlab.rl.multi_critic.MultiCriticPPO`."""
+  num_reward_groups: int = 2
+  """Number of independent value heads / reward groups."""
+  advantage_weights: Tuple[float, ...] = (0.5, 0.5)
+  """Per-group weights after each advantage stream is normalized."""
+
+
+@dataclass
 class RslRlBaseRunnerCfg:
   seed: int = 42
   """The seed for the experiment. Default is 42."""

@@ -438,6 +438,8 @@ class ManagerBasedRlEnv:
     self.reset_time_outs = self.termination_manager.time_outs
 
     self.reward_buf = self.reward_manager.compute(dt=self.step_dt)
+    if self.reward_manager.group_buf is not None:
+      self.extras["reward_groups"] = self.reward_manager.group_buf
     self.metrics_manager.compute()
 
     # Reset envs that terminated/timed-out and log the episode info.
